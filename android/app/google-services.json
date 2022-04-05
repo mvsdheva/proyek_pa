@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "227470105802",
+    "project_id": "herbal-app-eb0c6",
+    "storage_bucket": "herbal-app-eb0c6.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:227470105802:android:67d498a5f160d3eb2ee833",
+        "android_client_info": {
+          "package_name": "com.herbal"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "227470105802-v3ejpved3gffqjoiggs4f6mh6g9cbbvt.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.herbal",
+            "certificate_hash": "a272d3974d052a7c5730a056eb6dd3e398a0d30b"
+          }
+        },
+        {
+          "client_id": "227470105802-pu06jnk175a68848toviun2mv8in9asb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCISzXphvVWp04srx2IGSpU3e-Q-3mHwoo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "227470105802-pu06jnk175a68848toviun2mv8in9asb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
