@@ -69,6 +69,7 @@ class _NewsDetailPublicState extends State<NewsDetailPublic> {
     await ApiServices().addLikeNews(token, id.toString()).then((json) {
       if (json != null) {
         if (json['status'] == 'success') {
+          initiateData();
           print("berhasil1");
           setState(() {});
         } else {
@@ -86,6 +87,7 @@ class _NewsDetailPublicState extends State<NewsDetailPublic> {
     await ApiServices().removeLikeNews(token, id.toString()).then((json) {
       if (json != null) {
         if (json['status'] == 'success') {
+          initiateData();
           print("berhasil2");
           setState(() {});
         } else {
@@ -117,17 +119,15 @@ class _NewsDetailPublicState extends State<NewsDetailPublic> {
       if (json != null) {
         if (json['status'] == 'success') {
           tempData.clear();
-          print("berhasil");
           setState(() {
             tempData = json['data']['data'];
           });
+          // getGeneralItem();
         } else {
-          print("error5");
           alertError(json.toString(), 1);
         }
       }
     }).catchError((e) {
-      print("error3");
       alertError(e.toString(), 1);
     });
   }
@@ -160,6 +160,7 @@ class _NewsDetailPublicState extends State<NewsDetailPublic> {
         dataNews[0]['created_at'], 'EEE, dd MMMM yyyy hh:mm a');
     getItem();
     getGeneralItem();
+    // setState(() {});
     setState(() {
       isLoading = false;
     });
@@ -184,126 +185,132 @@ class _NewsDetailPublicState extends State<NewsDetailPublic> {
             Navigator.pop(context);
           },
         ),
-        body: SafeArea(
-          child: SingleChildScrollView(
-            scrollDirection: Axis.vertical,
-            child: Stack(
-              children: [
-                Image.network(
-                    !isLoading
-                        ? dataNews[0]['image']['path'].toString()
-                        : 'https://t4.ftcdn.net/jpg/00/89/55/15/360_F_89551596_LdHAZRwz3i4EM4J0NHNHy2hEUYDfXc0j.jpg',
-                    fit: BoxFit.cover,
-                    width: MediaQuery.of(context).size.width,
-                    height: MediaQuery.of(context).size.height * 0.5),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(0.0, 350.0, 0.0, 0.0),
-                  child: Container(
-                    height: MediaQuery.of(context).size.height,
-                    width: MediaQuery.of(context).size.width,
-                    child: Material(
-                      shadowColor: Colors.black,
-                      borderRadius: BorderRadius.circular(35),
-                      child: Column(
-                        children: <Widget>[
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(
-                                20.0, 20.0, 20.0, 20.0),
-                            child: Text(
-                              !isLoading ? dataNews[0]['title'] : '',
-                              style: const TextStyle(
-                                fontSize: 30.0,
-                                fontWeight: FontWeight.bold,
+        body: RefreshIndicator(
+          onRefresh: () async { initiateData(); },
+          child: SafeArea(
+            child: SingleChildScrollView(
+              scrollDirection: Axis.vertical,
+              child: Stack(
+                children: [
+                  Image.network(
+                      !isLoading
+                          ? dataNews[0]['image']['path'].toString()
+                          : 'https://t4.ftcdn.net/jpg/00/89/55/15/360_F_89551596_LdHAZRwz3i4EM4J0NHNHy2hEUYDfXc0j.jpg',
+                      fit: BoxFit.cover,
+                      width: MediaQuery.of(context).size.width,
+                      height: MediaQuery.of(context).size.height * 0.5),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(0.0, 350.0, 0.0, 0.0),
+                    child: Container(
+                      height: MediaQuery.of(context).size.height,
+                      width: MediaQuery.of(context).size.width,
+                      child: Material(
+                        shadowColor: Colors.black,
+                        borderRadius: BorderRadius.circular(35),
+                        child: Scrollbar(
+                          child: Column(
+                            children: <Widget>[
+                              Padding(
+                                padding: const EdgeInsets.fromLTRB(
+                                    20.0, 20.0, 20.0, 20.0),
+                                child: Text(
+                                  !isLoading ? dataNews[0]['title'] : '',
+                                  style: const TextStyle(
+                                    fontSize: 25.0,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
                               ),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(5.0),
-                            child: Text(
-                              !isLoading ? datePublish : ''.substring(0, 10),
-                              style: const TextStyle(fontSize: 20),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(5.0),
-                            child: Text(
-                              !isLoading ? dataNews[0]['author'] : '',
-                              style: const TextStyle(
-                                fontSize: 18.0,
+                              Padding(
+                                padding: const EdgeInsets.all(5.0),
+                                child: Text(
+                                  !isLoading ? datePublish : ''.substring(0, 10),
+                                  style: const TextStyle(fontSize: 20),
+                                ),
                               ),
-                            ),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.all(20.0),
-                            child: Text(
-                              !isLoading ? dataNews[0]['description'] : '',
-                              style: const TextStyle(
-                                fontSize: 25.0,
+                              Padding(
+                                padding: const EdgeInsets.all(5.0),
+                                child: Text(
+                                  !isLoading ? dataNews[0]['author'] : '',
+                                  style: const TextStyle(
+                                    fontSize: 18.0,
+                                  ),
+                                ),
                               ),
-                            ),
+                              Padding(
+                                padding: EdgeInsets.all(20.0),
+                                child: Text(
+                                  !isLoading ? dataNews[0]['description'] : '',
+                                  style: const TextStyle(
+                                    fontSize: 20.0,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
-                        ],
+                        ),
                       ),
                     ),
                   ),
-                ),
-                Positioned(
-                  top: MediaQuery.of(context).size.height * 0.39,
-                  right: MediaQuery.of(context).size.height * 0.03,
-                  child: Row(
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.zero,
-                        child: Container(
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(50),
-                              color: Colors.white,
-                              boxShadow: const [
-                                BoxShadow(color: Colors.black)
-                              ]),
-                          child: IconButton(
-                            icon: Icon(
-                              dataNews[0]['has_like']
-                                  ? Icons.favorite
-                                  : Icons.favorite_border,
-                              color: dataNews[0]['has_like']
-                                  ? Colors.red
-                                  : HexColor("2C3246"),
+                  Positioned(
+                    top: MediaQuery.of(context).size.height * 0.39,
+                    right: MediaQuery.of(context).size.height * 0.03,
+                    child: Row(
+                      children: [
+                        for(int i = 0; i < dataNews.length; i++)
+                        Padding(
+                          padding: EdgeInsets.zero,
+                          child: Container(
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(50),
+                                color: Colors.white,
+                                boxShadow: const [
+                                  BoxShadow(color: Colors.black)
+                                ]),
+                            child: IconButton(
+                              icon: Icon(
+                                dataNews[i]['has_like']
+                                    ? Icons.favorite
+                                    : Icons.favorite_border,
+                                color: dataNews[i]['has_like']
+                                    ? Colors.red
+                                    : HexColor("2C3246"),
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  likeManagement(
+                                      dataNews[i]['id'], dataNews[i]['has_like']);
+                                });
+                              },
                             ),
-                            onPressed: () {
-                              setState(() {
-                                likeManagement(
-                                    dataNews[0]['id'], dataNews[0]['has_like']);
-                              });
-                            },
                           ),
                         ),
-                      ),
-                      const SizedBox(
-                        width: 8,
-                      ),
-                      Padding(
-                        padding: EdgeInsets.zero,
-                        child: Container(
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(50),
-                              color: Colors.white,
-                              boxShadow: const [
-                                BoxShadow(color: Colors.black)
-                              ]),
-                          child: IconButton(
-                            icon: const Icon(Icons.share),
-                            onPressed: () {
-                              share();
-                              setState(() {});
-                            },
+                        const SizedBox(
+                          width: 8,
+                        ),
+                        Padding(
+                          padding: EdgeInsets.zero,
+                          child: Container(
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(50),
+                                color: Colors.white,
+                                boxShadow: const [
+                                  BoxShadow(color: Colors.black)
+                                ]),
+                            child: IconButton(
+                              icon: const Icon(Icons.share),
+                              onPressed: () {
+                                share();
+                                setState(() {});
+                              },
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ));

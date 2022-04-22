@@ -6,6 +6,7 @@ import 'dart:typed_data';
 
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:herbal/api/api_services.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
@@ -268,6 +269,7 @@ class ApotekAdminListState extends State<ApotekAdminList> {
         ),
       ),
       btnOk: DialogButton(
+        color: HexColor("#2C3246"),
         onPressed: () => {
           createItem(),
           Navigator.pop(context),
@@ -322,7 +324,20 @@ class ApotekAdminListState extends State<ApotekAdminList> {
                   ))
               : Stack(
                   children: <Widget>[
-                    Column(
+                    tempData.length == 0
+                    ? Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Center(
+                                  child: SvgPicture.asset(
+                                'assets/images/empty.svg',
+                                height: 150,
+                              )),
+                              SizedBox(height: 20,),
+                              Center(child: Text("Data Kosong"))
+                            ],
+                          )
+                    : Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: <Widget>[
                           Expanded(
@@ -426,17 +441,22 @@ class ApotekAdminListState extends State<ApotekAdminList> {
                                                             alignment: Alignment
                                                                 .bottomCenter,
                                                             child: Icon(
-                                                                Icons.delete),
+                                                                Icons.delete, color: Colors.white,),
                                                           ),
-                                                          style: ButtonStyle(
-                                                              shape: MaterialStateProperty.all<
-                                                                      RoundedRectangleBorder>(
-                                                                  RoundedRectangleBorder(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        20.0),
-                                                          ))),
+                                                           style: ElevatedButton
+                                                              .styleFrom(
+                                                            primary: HexColor(
+                                                                "2C3246"),
+                                                            onPrimary: HexColor(
+                                                                "2C3246"),
+                                                            onSurface: HexColor(
+                                                                "2C3246"),
+                                                            shape: RoundedRectangleBorder(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            20.0)),
+                                                          ),
                                                           onPressed: () => {
                                                                 setState(() {
                                                                   id = index;

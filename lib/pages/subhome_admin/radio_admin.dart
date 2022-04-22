@@ -1,8 +1,9 @@
-// ignore_for_file: unused_import, unnecessary_null_comparison
+// ignore_for_file: unused_import, unnecessary_null_comparison, prefer_const_constructors
 
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:http/http.dart' as http;
 import 'package:awesome_dialog/awesome_dialog.dart';
@@ -62,7 +63,7 @@ class RadioAdminListState extends State<RadioAdminList> {
         if (json['status'] == 'success') {
           setState(() {
             tempData = json['data']['data'];
-            print( tempData = json['data']['data']);
+            print(tempData = json['data']['data']);
           });
         } else {
           alertError(json.toString(), 1);
@@ -289,6 +290,7 @@ class RadioAdminListState extends State<RadioAdminList> {
         ),
       ),
       btnOk: DialogButton(
+        color:  HexColor("2C3246"),
         onPressed: () => {
           updateItem(idUpdate.toString()),
           Navigator.pop(context),
@@ -466,6 +468,7 @@ class RadioAdminListState extends State<RadioAdminList> {
         ),
       ),
       btnOk: DialogButton(
+        color: HexColor("2C3246"),
         onPressed: () => {
           createItem(),
           Navigator.pop(context),
@@ -485,7 +488,7 @@ class RadioAdminListState extends State<RadioAdminList> {
     windowWidth = MediaQuery.of(context).size.width;
     return Scaffold(
         floatingActionButton: FloatingActionButton(
-            onPressed: (){
+            onPressed: () {
               setState(() {
                 edited = false;
               });
@@ -522,170 +525,208 @@ class RadioAdminListState extends State<RadioAdminList> {
                   ))
               : Stack(
                   children: <Widget>[
-                    Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: <Widget>[
-                          Expanded(
-                            flex: 1,
-                            child: ListView(
-                              scrollDirection: Axis.vertical,
-                              physics: const AlwaysScrollableScrollPhysics(),
-                              shrinkWrap: true,
-                              padding: const EdgeInsets.all(5.0),
-                              children: <Widget>[
-                                Container(
-                                    margin: const EdgeInsets.all(2),
-                                    alignment: Alignment.topCenter,
-                                    child: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          for (int index = 0;
-                                              index < tempData.length;
-                                              index++)
-                                            Container(
-                                              margin:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 5,
-                                                      vertical: 5),
-                                              decoration: BoxDecoration(
-                                                border: Border.all(
-                                                  color: Colors.black12,
-                                                  width: 2,
-                                                ),
-                                                borderRadius:
-                                                    BorderRadius.circular(12),
-                                              ),
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        vertical: 7,
-                                                        horizontal: 10),
-                                                child: Row(children: [
-                                                  Expanded(
-                                                      flex: 4,
-                                                      child: Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                    .symmetric(
-                                                                horizontal: 10),
-                                                        child: Text(
-                                                            tempData[index]
-                                                                    ['name']
-                                                                .toString(),
-                                                            textAlign:
-                                                                TextAlign.start,
-                                                            style: const TextStyle(
-                                                                fontFamily:
-                                                                    'Nunito',
-                                                                color: Colors
-                                                                    .black,
-                                                                fontSize: 12,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .normal,
-                                                                decoration:
-                                                                    TextDecoration
-                                                                        .none)),
-                                                      )),
-                                                  Expanded(
-                                                      flex: 1,
-                                                      child: ElevatedButton(
-                                                          child: const Align(
-                                                            alignment: Alignment
-                                                                .bottomCenter,
-                                                            child: Icon(
-                                                                Icons.delete),
-                                                          ),
-                                                          style: ButtonStyle(
-                                                              shape: MaterialStateProperty.all<
-                                                                      RoundedRectangleBorder>(
-                                                                  RoundedRectangleBorder(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        20.0),
-                                                          ))),
-                                                          onPressed: () => {
-                                                                setState(() {
-                                                                  id = index;
-                                                                  idUpdate =
-                                                                      tempData[
-                                                                              index]
-                                                                          [
-                                                                          'id'];
-                                                                }),
-                                                                deleteAlert(
-                                                                    index)
-                                                              })),
-                                                  SizedBox(
-                                                    width: windowWidth * 0.02,
-                                                  ),
-                                                  Expanded(
-                                                      flex: 1,
-                                                      child: ElevatedButton(
-                                                          child: const Align(
-                                                            alignment: Alignment
-                                                                .center,
-                                                            child: Icon(
-                                                                Icons.edit),
-                                                          ),
-                                                          style: ButtonStyle(
-                                                              shape: MaterialStateProperty.all<
-                                                                      RoundedRectangleBorder>(
-                                                                  RoundedRectangleBorder(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        18.0),
-                                                          ))),
-                                                          onPressed: () => {
-                                                                setState(() {
-                                                                  id = index;
-                                                                  idUpdate =
-                                                                      tempData[
-                                                                              index]
-                                                                          [
-                                                                          'id'];
-                                                                }),
-                                                                updateData()
-                                                              })),
-                                                ]),
-                                              ),
-                                            ),
-                                        ])),
-                                SizedBox(
-                                  height: windowHeight * 0.02,
-                                ),
-                                // Container(
-                                //   margin: const EdgeInsets.symmetric(
-                                //       horizontal: 15),
-                                //   child: ElevatedButton(
-                                //       onPressed: () => {
-
-                                //           },
-                                //       child: Padding(
-                                //           padding: const EdgeInsets.all(10),
-                                //           // ignore: sized_box_for_whitespace
-                                //           child: Container(
-                                //             width: windowWidth * 0.8,
-                                //             child: Column(
-                                //               children: <Widget>[
-                                //                 const Icon(
-                                //                   Icons.add,
-                                //                   size: 25,
-                                //                 ),
-                                //                 SizedBox(
-                                //                   height: windowHeight * 0.01,
-                                //                 ),
-                                //                 const Text("Tambah List Radio")
-                                //               ],
-                                //             ),
-                                //           ))),
-                                // ),
-                              ],
-                            ),
+                    // ignore: unrelated_type_equality_checks
+                    tempData.length == 0
+                        ? Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Center(
+                                  child: SvgPicture.asset(
+                                'assets/images/empty.svg',
+                                height: 150,
+                              )),
+                              SizedBox(height: 20,),
+                              Center(child: Text("Data Kosong"))
+                            ],
                           )
-                        ]),
+                        : Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: <Widget>[
+                                Expanded(
+                                  flex: 1,
+                                  child: ListView(
+                                    scrollDirection: Axis.vertical,
+                                    physics:
+                                        const AlwaysScrollableScrollPhysics(),
+                                    shrinkWrap: true,
+                                    padding: const EdgeInsets.all(5.0),
+                                    children: <Widget>[
+                                      Container(
+                                          margin: const EdgeInsets.all(2),
+                                          alignment: Alignment.topCenter,
+                                          child: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                for (int index = 0;
+                                                    index < tempData.length;
+                                                    index++)
+                                                  Container(
+                                                    margin: const EdgeInsets
+                                                            .symmetric(
+                                                        horizontal: 5,
+                                                        vertical: 5),
+                                                    decoration: BoxDecoration(
+                                                      border: Border.all(
+                                                        color: Colors.black12,
+                                                        width: 2,
+                                                      ),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              12),
+                                                    ),
+                                                    child: Padding(
+                                                      padding: const EdgeInsets
+                                                              .symmetric(
+                                                          vertical: 7,
+                                                          horizontal: 10),
+                                                      child: Row(children: [
+                                                        Expanded(
+                                                            flex: 4,
+                                                            child: Padding(
+                                                              padding: const EdgeInsets
+                                                                      .symmetric(
+                                                                  horizontal:
+                                                                      10),
+                                                              child: Text(
+                                                                  tempData[index][
+                                                                          'name']
+                                                                      .toString(),
+                                                                  textAlign:
+                                                                      TextAlign
+                                                                          .start,
+                                                                  style: const TextStyle(
+                                                                      fontFamily:
+                                                                          'Nunito',
+                                                                      color: Colors
+                                                                          .black,
+                                                                      fontSize:
+                                                                          12,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .normal,
+                                                                      decoration:
+                                                                          TextDecoration
+                                                                              .none)),
+                                                            )),
+                                                        Expanded(
+                                                            flex: 1,
+                                                            child:
+                                                                ElevatedButton(
+                                                                    child:
+                                                                        const Align(
+                                                                      alignment:
+                                                                          Alignment
+                                                                              .bottomCenter,
+                                                                      child:
+                                                                          Icon(
+                                                                        Icons
+                                                                            .delete,
+                                                                        color: Colors
+                                                                            .white,
+                                                                      ),
+                                                                    ),
+                                                                    style: ElevatedButton
+                                                                        .styleFrom(
+                                                                      primary:
+                                                                          HexColor(
+                                                                              "2C3246"),
+                                                                      onPrimary:
+                                                                          HexColor(
+                                                                              "2C3246"),
+                                                                      onSurface:
+                                                                          HexColor(
+                                                                              "2C3246"),
+                                                                      shape: RoundedRectangleBorder(
+                                                                          borderRadius:
+                                                                              BorderRadius.circular(20.0)),
+                                                                    ),
+                                                                    onPressed:
+                                                                        () => {
+                                                                              setState(() {
+                                                                                id = index;
+                                                                                idUpdate = tempData[index]['id'];
+                                                                              }),
+                                                                              deleteAlert(index)
+                                                                            })),
+                                                        SizedBox(
+                                                          width: windowWidth *
+                                                              0.02,
+                                                        ),
+                                                        Expanded(
+                                                            flex: 1,
+                                                            child:
+                                                                ElevatedButton(
+                                                                    child:
+                                                                        const Align(
+                                                                      alignment:
+                                                                          Alignment
+                                                                              .center,
+                                                                      child: Icon(
+                                                                          Icons
+                                                                              .edit,
+                                                                          color:
+                                                                              Colors.white),
+                                                                    ),
+                                                                    style: ElevatedButton
+                                                                        .styleFrom(
+                                                                      primary:
+                                                                          HexColor(
+                                                                              "2C3246"),
+                                                                      onPrimary:
+                                                                          HexColor(
+                                                                              "2C3246"),
+                                                                      onSurface:
+                                                                          HexColor(
+                                                                              "2C3246"),
+                                                                      shape: RoundedRectangleBorder(
+                                                                          borderRadius:
+                                                                              BorderRadius.circular(20.0)),
+                                                                    ),
+                                                                    onPressed:
+                                                                        () => {
+                                                                              setState(() {
+                                                                                id = index;
+                                                                                idUpdate = tempData[index]['id'];
+                                                                              }),
+                                                                              updateData()
+                                                                            })),
+                                                      ]),
+                                                    ),
+                                                  ),
+                                              ])),
+                                      SizedBox(
+                                        height: windowHeight * 0.02,
+                                      ),
+                                      // Container(
+                                      //   margin: const EdgeInsets.symmetric(
+                                      //       horizontal: 15),
+                                      //   child: ElevatedButton(
+                                      //       onPressed: () => {
+
+                                      //           },
+                                      //       child: Padding(
+                                      //           padding: const EdgeInsets.all(10),
+                                      //           // ignore: sized_box_for_whitespace
+                                      //           child: Container(
+                                      //             width: windowWidth * 0.8,
+                                      //             child: Column(
+                                      //               children: <Widget>[
+                                      //                 const Icon(
+                                      //                   Icons.add,
+                                      //                   size: 25,
+                                      //                 ),
+                                      //                 SizedBox(
+                                      //                   height: windowHeight * 0.01,
+                                      //                 ),
+                                      //                 const Text("Tambah List Radio")
+                                      //               ],
+                                      //             ),
+                                      //           ))),
+                                      // ),
+                                    ],
+                                  ),
+                                )
+                              ]),
                     (cropProses)
                         ? Container(
                             height: MediaQuery.of(context).size.height,

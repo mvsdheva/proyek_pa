@@ -1,8 +1,9 @@
-// ignore_for_file: unused_import, prefer_typing_uninitialized_variables, unused_field, deprecated_member_use, unnecessary_null_comparison, prefer_conditional_assignment, avoid_unnecessary_containers, sized_box_for_whitespace, prefer_const_constructors, duplicate_ignore, unused_local_variable, avoid_print
+// ignore_for_file: unused_import, prefer_typing_uninitialized_variables, unused_field, deprecated_member_use, unnecessary_null_comparison, prefer_conditional_assignment, avoid_unnecessary_containers, sized_box_for_whitespace, prefer_const_constructors, duplicate_ignore, unused_local_variable, avoid_print, prefer_const_literals_to_create_immutables
 
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:http/http.dart' as http;
 
@@ -15,6 +16,7 @@ import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:sliding_sheet/sliding_sheet.dart';
 
 class MedicineAdmin extends StatefulWidget {
   const MedicineAdmin({Key? key}) : super(key: key);
@@ -38,11 +40,13 @@ class MedicineAdminState extends State<MedicineAdmin> {
   double windowHeight = 0;
   double windowWidth = 0;
   bool cropProses = false;
+  bool isChecked = false;
   String token = '';
   bool edited = false;
   int id = 0;
   int idUpdate = 0;
   var tempData = [];
+  var tempApotek = [];
   var apotekList = [];
   var list_unit = [];
   bool isLoading = true;
@@ -105,7 +109,7 @@ class MedicineAdminState extends State<MedicineAdmin> {
   }
 
   getApotek() async {
-    apotekList.add({"id": '', "name": 'Select Apotek', "link_address": ''});
+    apotekList.add({"id": '', "name": 'Select Apotek'});
     setState(() {
       isLoading = true;
     });
@@ -116,7 +120,6 @@ class MedicineAdminState extends State<MedicineAdmin> {
             apotekList.add({
               "id": item['id'],
               "name": item['name'],
-              "link_address": item['link_address']
             });
           }
           setState(() {
@@ -317,464 +320,618 @@ class MedicineAdminState extends State<MedicineAdmin> {
         }
       }
     }
-
-    showBarModalBottomSheet(
-        isDismissible: false,
-        context: context,
-        builder: (context) {
-          return Container(
-            padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
-            child: Padding(
-              padding: const EdgeInsets.all(15.0),
-              child: Column(
-                children: <Widget>[
-                  Align(
-                    alignment: const Alignment(0, 1),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        CircleAvatar(
-                            backgroundColor: Colors.white,
-                            radius: 55,
-                            child: Hero(
-                              tag: "pp",
-                              child: imageTemp != null
-                                  ? CircleAvatar(
-                                      backgroundColor: Colors.black38,
-                                      backgroundImage: MemoryImage(imageTemp!),
-                                      radius: 100.0,
-                                    )
-                                  : edited
-                                      ? Image.network(
-                                          tempData[id]['image']['path']
-                                              .toString(),
-                                          width: 200)
-                                      : const CircleAvatar(
-                                          backgroundColor: Colors.black38,
-                                          backgroundImage: null,
-                                          radius: 100.0,
-                                        ),
-                            )),
-                      ],
+    showSlidingBottomSheet(context, builder: (context) {
+      return SlidingSheetDialog(
+          cornerRadius: 16,
+          avoidStatusBar: true,
+          snapSpec: SnapSpec(
+            snap :true,
+            initialSnap: 1,
+            positioning: SnapPositioning.relativeToAvailableSpace,
+          ),
+          headerBuilder: (context, state) => Material(
+                child: Container(
+                  width: double.infinity,
+                  color: HexColor("#2C3246"),
+                  child: Column(mainAxisSize: MainAxisSize.min, children: [
+                    SizedBox(
+                      height: 10,
                     ),
-                  ),
-                  Align(
-                    alignment: Alignment.center,
-                    // ignore: sized_box_for_whitespace
-                    child: Container(
-                      width: MediaQuery.of(context).size.width * 0.3,
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          primary: HexColor("2C3246"),
-                          onPrimary: HexColor("2C3246"),
-                          onSurface: HexColor("2C3246"),
-                        ),
-                        onPressed: () {
-                          // if (typeAlert == "Edit") {
-                          edited = true;
-                          // } else {
-                          // edited = true;
-                          // }
-                          Navigator.pop(context);
-                          popUpCamera();
-                        },
-                        child: Container(
-                          alignment: Alignment.center,
-                          child: Container(
-                            child: Row(
-                              children: const <Widget>[
-                                Icon(
-                                  Icons.camera_alt,
-                                  color: Colors.white,
-                                ),
-                                SizedBox(
-                                  width: 5,
-                                ),
-                                Text(
-                                  "Tambah",
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                      color: Colors.white, fontSize: 15),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
+                    Container(
+                      width: 32,
+                      height: 8,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          color: Colors.white),
                     ),
-                  ),
-                  TextField(
-                    controller: namaBarang,
-                    keyboardType: TextInputType.text,
-                    decoration: const InputDecoration(
-                        icon: Icon(Icons.production_quantity_limits),
-                        labelText: "Nama Barang"),
-                  ),
-                  TextField(
-                    controller: hargaBarang,
-                    keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(
-                      icon: Icon(Icons.monetization_on),
-                      labelText: "Harga barang",
+                    SizedBox(
+                      height: 10,
                     ),
-                  ),
-                  TextField(
-                    keyboardType: TextInputType.number,
-                    controller: stock,
-                    decoration: const InputDecoration(
-                      icon: Icon(Icons.confirmation_number),
-                      labelText: "Stock",
-                    ),
-                  ),
-                  Container(
-                    width: double.infinity,
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.ac_unit,
-                          color: Colors.grey,
-                        ),
-                        SizedBox(
-                          width: 15,
-                        ),
-                        Expanded(
-                          flex: 1,
-                          child: DropdownButtonFormField<String>(
-                            isExpanded: true,
-                            items: list_unit
-                                .map<DropdownMenuItem<String>>((items) {
-                              return DropdownMenuItem(
-                                  value: items['id'].toString(),
-                                  child: Text(items['name']));
-                            }).toList(),
-                            value: unitChoose,
-                            onChanged: (val) => setState(() {
-                              unitChoose = val.toString();
-                            }),
-                            onSaved: (val) => setState(() {
-                              unitChoose = val.toString();
-                            }),
-                            hint: Text(
-                              "Select Item",
-                              style: TextStyle(color: Colors.grey),
-                              textAlign: TextAlign.end,
-                            ),
-                            icon: Padding(
-                                //Icon at tail, arrow bottom is default icon
-                                padding: EdgeInsets.only(left: 20),
-                                child: Icon(Icons.arrow_downward)),
-                            style: TextStyle(
-                              color: unitChoose == ""
-                                  ? Colors.grey[800]
-                                  : Colors.black,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    width: double.infinity,
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.medical_services,
-                          color: Colors.grey,
-                        ),
-                        SizedBox(
-                          width: 15,
-                        ),
-                        Expanded(
-                          flex: 1,
-                          child: DropdownButtonFormField<String>(
-                            isExpanded: true,
-                            items: apotekList
-                                .map<DropdownMenuItem<String>>((items) {
-                              return DropdownMenuItem(
-                                  value: items['id'].toString(),
-                                  child: Text(items['name']));
-                            }).toList(),
-                            value: selectApotek,
-                            onChanged: (val) => setState(() {
-                              selectApotek = val.toString();
-                            }),
-                            onSaved: (val) => setState(() {
-                              selectApotek = val.toString();
-                            }),
-                            hint: Text(
-                              "Select Item",
-                              style: TextStyle(color: Colors.grey),
-                              textAlign: TextAlign.end,
-                            ),
-                            icon: Padding(
-                                //Icon at tail, arrow bottom is default icon
-                                padding: EdgeInsets.only(left: 20),
-                                child: Icon(Icons.arrow_downward)),
-                            style: TextStyle(
-                              color: selectApotek == ""
-                                  ? Colors.grey[800]
-                                  : Colors.black,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  TextField(
-                    keyboardType: TextInputType.text,
-                    controller: deskipsi,
-                    decoration: const InputDecoration(
-                      icon: Icon(Icons.description),
-                      labelText: "Deskrispi",
-                    ),
-                  ),
-                  ElevatedButton(
-                    onPressed: () => {
-                      typeAlert == "Edit"
-                          ? updateItem(idUpdate.toString())
-                          : createItem(),
-                      Navigator.pop(context),
-                    },
-                    child: Text(
-                      typeAlert == "Edit" ? "Simpan Data" : "Tambah Data",
-                      style: const TextStyle(color: Colors.white, fontSize: 20),
-                    ),
-                  ),
-                ],
+                  ]),
+                ),
               ),
-            ),
-          );
-        });
-    // AwesomeDialog(
-    //   context: context,
-    //   onDissmissCallback: (type) {
-    //     edited = false;
-    //     imageTemp = null;
-    //     namaBarang.text = "";
-    //     hargaBarang.text = "";
-    //     stock.text = "";
-    //     unitChoose = "1";
-    //     deskipsi.text = "";
-    //   },
-    //   dialogType: DialogType.NO_HEADER,
-    //   animType: AnimType.SCALE,
-    //   headerAnimationLoop: false,
-    //   title: 'Warning',
-    //   desc: "Anda yakin ingin menghapus data?",
-    //   body: Padding(
-    //     padding: const EdgeInsets.all(15.0),
-    //     child: Column(
-    //       children: <Widget>[
-    //         Align(
-    //           alignment: const Alignment(0, 1),
-    //           child: Column(
-    //             mainAxisSize: MainAxisSize.min,
-    //             children: [
-    //               CircleAvatar(
-    //                   backgroundColor: Colors.white,
-    //                   radius: 55,
-    //                   child: Hero(
-    //                     tag: "pp",
-    //                     child: imageTemp != null
-    //                         ? CircleAvatar(
-    //                             backgroundColor: Colors.black38,
-    //                             backgroundImage: MemoryImage(imageTemp!),
-    //                             radius: 100.0,
-    //                           )
-    //                         : edited
-    //                             ? Image.network(
-    //                                 tempData[id]['image']['path'].toString(),
-    //                                 width: 200)
-    //                             : const CircleAvatar(
-    //                                 backgroundColor: Colors.black38,
-    //                                 backgroundImage: null,
-    //                                 radius: 100.0,
-    //                               ),
-    //                   )),
-    //             ],
-    //           ),
-    //         ),
-    //         Align(
-    //           alignment: Alignment.center,
-    //           // ignore: sized_box_for_whitespace
-    //           child: Container(
-    //             width: MediaQuery.of(context).size.width * 0.3,
-    //             child: ElevatedButton(
-    //               style: ElevatedButton.styleFrom(
-    //                 primary: Colors.blue,
-    //                 onPrimary: Colors.grey,
-    //                 onSurface: Colors.black,
-    //               ),
-    //               onPressed: () {
-    //                 // if (typeAlert == "Edit") {
-    //                 edited = true;
-    //                 // } else {
-    //                 // edited = true;
-    //                 // }
-    //                 Navigator.pop(context);
-    //                 popUpCamera();
-    //               },
-    //               child: Container(
-    //                 alignment: Alignment.center,
-    //                 child: Container(
-    //                   child: Row(
-    //                     children: const <Widget>[
-    //                       Icon(
-    //                         Icons.camera_alt,
-    //                         color: Colors.white,
-    //                       ),
-    //                       SizedBox(
-    //                         width: 5,
-    //                       ),
-    //                       Text(
-    //                         "Tambah",
-    //                         textAlign: TextAlign.center,
-    //                         style: TextStyle(color: Colors.white, fontSize: 15),
-    //                       ),
-    //                     ],
-    //                   ),
-    //                 ),
-    //               ),
-    //             ),
-    //           ),
-    //         ),
-    //         TextField(
-    //           controller: namaBarang,
-    //           keyboardType: TextInputType.text,
-    //           decoration: const InputDecoration(
-    //               icon: Icon(Icons.production_quantity_limits),
-    //               labelText: "Nama Barang"),
-    //         ),
-    //         TextField(
-    //           controller: hargaBarang,
-    //           keyboardType: TextInputType.number,
-    //           decoration: const InputDecoration(
-    //             icon: Icon(Icons.monetization_on),
-    //             labelText: "Harga barang",
-    //           ),
-    //         ),
-    //         TextField(
-    //           keyboardType: TextInputType.number,
-    //           controller: stock,
-    //           decoration: const InputDecoration(
-    //             icon: Icon(Icons.confirmation_number),
-    //             labelText: "Stock",
-    //           ),
-    //         ),
-    //         Container(
-    //           width: double.infinity,
-    //           child: Row(
-    //             children: [
-    //               Icon(
-    //                 Icons.ac_unit,
-    //                 color: Colors.grey,
-    //               ),
-    //               SizedBox(
-    //                 width: 15,
-    //               ),
-    //               Expanded(
-    //                 flex: 1,
-    //                 child: DropdownButtonFormField<String>(
-    //                   isExpanded: true,
-    //                   items: list_unit.map<DropdownMenuItem<String>>((items) {
-    //                     return DropdownMenuItem(
-    //                         value: items['id'].toString(),
-    //                         child: Text(items['name']));
-    //                   }).toList(),
-    //                   value: unitChoose,
-    //                   onChanged: (val) => setState(() {
-    //                     unitChoose = val.toString();
-    //                   }),
-    //                   onSaved: (val) => setState(() {
-    //                     unitChoose = val.toString();
-    //                   }),
-    //                   hint: Text(
-    //                     "Select Item",
-    //                     style: TextStyle(color: Colors.grey),
-    //                     textAlign: TextAlign.end,
-    //                   ),
-    //                   icon: Padding(
-    //                       //Icon at tail, arrow bottom is default icon
-    //                       padding: EdgeInsets.only(left: 20),
-    //                       child: Icon(Icons.arrow_downward)),
-    //                   style: TextStyle(
-    //                     color:
-    //                         unitChoose == "" ? Colors.grey[800] : Colors.black,
-    //                   ),
-    //                 ),
-    //               ),
-    //             ],
-    //           ),
-    //         ),
-    //         Container(
-    //           width: double.infinity,
-    //           child: Row(
-    //             children: [
-    //               Icon(
-    //                 Icons.medical_services,
-    //                 color: Colors.grey,
-    //               ),
-    //               SizedBox(
-    //                 width: 15,
-    //               ),
-    //               Expanded(
-    //                 flex: 1,
-    //                 child: DropdownButtonFormField<String>(
-    //                   isExpanded: true,
-    //                   items: apotekList.map<DropdownMenuItem<String>>((items) {
-    //                     return DropdownMenuItem(
-    //                         value: items['id'].toString(),
-    //                         child: Text(items['name']));
-    //                   }).toList(),
-    //                   value: selectApotek,
-    //                   onChanged: (val) => setState(() {
-    //                     selectApotek = val.toString();
-    //                   }),
-    //                   onSaved: (val) => setState(() {
-    //                     selectApotek = val.toString();
-    //                   }),
-    //                   hint: Text(
-    //                     "Select Item",
-    //                     style: TextStyle(color: Colors.grey),
-    //                     textAlign: TextAlign.end,
-    //                   ),
-    //                   icon: Padding(
-    //                       //Icon at tail, arrow bottom is default icon
-    //                       padding: EdgeInsets.only(left: 20),
-    //                       child: Icon(Icons.arrow_downward)),
-    //                   style: TextStyle(
-    //                     color: selectApotek == ""
-    //                         ? Colors.grey[800]
-    //                         : Colors.black,
-    //                   ),
-    //                 ),
-    //               ),
-    //             ],
-    //           ),
-    //         ),
-    //         TextField(
-    //           keyboardType: TextInputType.text,
-    //           controller: deskipsi,
-    //           decoration: const InputDecoration(
-    //             icon: Icon(Icons.description),
-    //             labelText: "Deskrispi",
-    //           ),
-    //         ),
-    //       ],
-    //     ),
-    //   ),
-    //   btnOk: DialogButton(
-    //     onPressed: () => {
-    //       typeAlert == "Edit" ? updateItem(idUpdate.toString()) : createItem(),
-    //       Navigator.pop(context),
-    //     },
-    //     child: Text(
-    //       typeAlert == "Edit" ? "Simpan Data" : "Tambah Data",
-    //       style: const TextStyle(color: Colors.white, fontSize: 20),
-    //     ),
-    //   ),
-    //   btnOkOnPress: () {},
-    // ).show();
+          builder: (context, state) {
+            return Material(
+              child: ListView(shrinkWrap: true, primary: false, children: [
+                Container(
+                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 10),
+                  child: Padding(
+                    padding: const EdgeInsets.all(15.0),
+                    child: Column(
+                      children: <Widget>[
+                        Align(
+                          alignment: const Alignment(0, 1),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              CircleAvatar(
+                                  backgroundColor: Colors.white,
+                                  radius: 55,
+                                  child: Hero(
+                                    tag: "pp",
+                                    child: imageTemp != null
+                                        ? CircleAvatar(
+                                            backgroundColor: Colors.black38,
+                                            backgroundImage:
+                                                MemoryImage(imageTemp!),
+                                            radius: 100.0,
+                                          )
+                                        : edited
+                                            ? Image.network(
+                                                tempData[id]['image']['path']
+                                                    .toString(),
+                                                width: 200)
+                                            : const CircleAvatar(
+                                                backgroundColor: Colors.black38,
+                                                backgroundImage: null,
+                                                radius: 100.0,
+                                              ),
+                                  )),
+                            ],
+                          ),
+                        ),
+                        Align(
+                          alignment: Alignment.center,
+                          // ignore: sized_box_for_whitespace
+                          child: Container(
+                            width: MediaQuery.of(context).size.width * 0.3,
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                primary: HexColor("2C3246"),
+                                onPrimary: HexColor("2C3246"),
+                                onSurface: HexColor("2C3246"),
+                              ),
+                              onPressed: () {
+                                // if (typeAlert == "Edit") {
+                                edited = true;
+                                // } else {
+                                // edited = true;
+                                // }
+                                Navigator.pop(context);
+                                popUpCamera();
+                              },
+                              child: Container(
+                                alignment: Alignment.center,
+                                child: Container(
+                                  child: Row(
+                                    children: const <Widget>[
+                                      Icon(
+                                        Icons.camera_alt,
+                                        color: Colors.white,
+                                      ),
+                                      SizedBox(
+                                        width: 5,
+                                      ),
+                                      Text(
+                                        "Tambah",
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                            color: Colors.white, fontSize: 15),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        TextField(
+                          controller: namaBarang,
+                          keyboardType: TextInputType.text,
+                          decoration: const InputDecoration(
+                              icon: Icon(Icons.production_quantity_limits),
+                              labelText: "Nama Barang"),
+                        ),
+                        TextField(
+                          controller: hargaBarang,
+                          keyboardType: TextInputType.number,
+                          decoration: const InputDecoration(
+                            icon: Icon(Icons.monetization_on),
+                            labelText: "Harga barang",
+                          ),
+                        ),
+                        TextField(
+                          keyboardType: TextInputType.number,
+                          controller: stock,
+                          decoration: const InputDecoration(
+                            icon: Icon(Icons.confirmation_number),
+                            labelText: "Stock",
+                          ),
+                        ),
+                        Container(
+                          width: double.infinity,
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.ac_unit,
+                                color: Colors.grey,
+                              ),
+                              SizedBox(
+                                width: 15,
+                              ),
+                              Expanded(
+                                flex: 1,
+                                child: DropdownButtonFormField<String>(
+                                  isExpanded: true,
+                                  items: list_unit
+                                      .map<DropdownMenuItem<String>>((items) {
+                                    return DropdownMenuItem(
+                                        value: items['id'].toString(),
+                                        child: Text(items['name']));
+                                  }).toList(),
+                                  value: unitChoose,
+                                  onChanged: (val) => setState(() {
+                                    unitChoose = val.toString();
+                                  }),
+                                  onSaved: (val) => setState(() {
+                                    unitChoose = val.toString();
+                                  }),
+                                  hint: Text(
+                                    "Select Item",
+                                    style: TextStyle(color: Colors.grey),
+                                    textAlign: TextAlign.end,
+                                  ),
+                                  icon: Padding(
+                                      //Icon at tail, arrow bottom is default icon
+                                      padding: EdgeInsets.only(left: 20),
+                                      child: Icon(Icons.arrow_downward)),
+                                  style: TextStyle(
+                                    color: unitChoose == ""
+                                        ? Colors.grey[800]
+                                        : Colors.black,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        // Container(
+                        //   height: 50,
+                        //   width: double.infinity,
+                        //   child: Row(
+                        //     children: [
+                        //       Icon(
+                        //         Icons.medical_services,
+                        //         color: Colors.grey,
+                        //       ),
+                        //       SizedBox(
+                        //         width: 15,
+                        //       ),
+                        //       InkWell(
+                        //         onTap: () {
+                        //           print(apotekList[0]);
+                        //           showDialog(
+                        //               barrierDismissible: false,
+                        //               context: context,
+                        //               builder: (BuildContext context) {
+                        //                 return AlertDialog(
+                        //                   actions: [
+                        //                     ElevatedButton(
+                        //                       onPressed: () {
+                        //                         Navigator.pop(context);
+                        //                       },
+                        //                       child: Text("Cancel"),
+                        //                     ),
+                        //                     ElevatedButton(
+                        //                       onPressed: () {},
+                        //                       child: Text("Ok"),
+                        //                     ),
+                        //                   ],
+                        //                   content: Container(
+                        //                     width: double.maxFinite,
+                        //                     child: Column(
+                        //                         mainAxisSize: MainAxisSize.min,
+                        //                         children: <Widget>[
+                        //                           Expanded(
+                        //                               child: ListView.builder(
+                        //                             itemCount:
+                        //                                 apotekList.length,
+                        //                             shrinkWrap: true,
+                        //                             itemBuilder:
+                        //                                 (BuildContext context,
+                        //                                     int index) {
+                        //                               return StatefulBuilder(
+                        //                                 builder: (BuildContext
+                        //                                         context,
+                        //                                     setState) {
+                        //                                   return CheckboxListTile(
+                        //                                       title: Text(
+                        //                                           apotekList[
+                        //                                                   index]
+                        //                                               ['name']),
+                        //                                       value: isChecked,
+                        //                                       onChanged: (val) {
+                        //                                         isChecked =
+                        //                                             val!;
+                        //                                       });
+                        //                                 },
+                        //                               );
+                        //                             },
+                        //                           ))
+                        //                         ]),
+                        //                   ),
+                        //                 );
+                        //               });
+                        //         },
+                        //         child: Container(
+                        //           width:
+                        //               MediaQuery.of(context).size.width * 0.68,
+                        //           height: 40,
+                        //           // color: Colors.yellow,
+                        //           decoration: BoxDecoration(
+                        //               // color: Colors.white,
+                        //               borderRadius: BorderRadius.circular(10),
+                        //               border: Border(
+                        //                 bottom: BorderSide(color: Colors.black),
+                        //                 top: BorderSide(color: Colors.black),
+                        //                 left: BorderSide(color: Colors.black),
+                        //                 right: BorderSide(color: Colors.black),
+                        //               )),
+                        //           child: Container(
+                        //             width: double.infinity,
+                        //             child: Row(
+                        //               mainAxisAlignment:
+                        //                   MainAxisAlignment.spaceBetween,
+                        //               children: [
+                        //                 Padding(
+                        //                     padding: const EdgeInsets.all(5.0),
+                        //                     child: Text("apotek")),
+                        //                 Padding(
+                        //                   padding: const EdgeInsets.all(5.0),
+                        //                   child: Align(
+                        //                       alignment: Alignment.centerRight,
+                        //                       child: Icon(
+                        //                         Icons.arrow_downward,
+                        //                       )),
+                        //                 )
+                        //               ],
+                        //             ),
+                        //           ),
+                        //         ),
+                        //       ),
+                        //     ],
+                        //   ),
+                        // ),
+                        Container(
+                          width: double.infinity,
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.medical_services,
+                                color: Colors.grey,
+                              ),
+                              SizedBox(
+                                width: 15,
+                              ),
+
+                              Expanded(
+                                flex: 1,
+                                child:
+                                 DropdownButtonFormField<String>(
+                                  isExpanded: true,
+                                  items: apotekList
+                                      .map<DropdownMenuItem<String>>((items) {
+                                    return DropdownMenuItem(
+                                        value: items['id'].toString(),
+                                        child: Text(items['name']));
+                                  }).toList(),
+                                  value: selectApotek,
+                                  onChanged: (val) => setState(() {
+                                    selectApotek = val.toString();
+                                  }),
+                                  onSaved: (val) => setState(() {
+                                    selectApotek = val.toString();
+                                  }),
+                                  hint: Text(
+                                    "Select Item",
+                                    style: TextStyle(color: Colors.grey),
+                                    textAlign: TextAlign.end,
+                                  ),
+                                  icon: Padding(
+                                      //Icon at tail, arrow bottom is default icon
+                                      padding: EdgeInsets.only(left: 20),
+                                      child: Icon(Icons.arrow_downward)),
+                                  style: TextStyle(
+                                    color: selectApotek == ""
+                                        ? Colors.grey[800]
+                                        : Colors.black,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        TextField(
+                          keyboardType: TextInputType.text,
+                          controller: deskipsi,
+                          decoration: const InputDecoration(
+                            icon: Icon(Icons.description),
+                            labelText: "Deskrispi",
+                          ),
+                        ),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            primary: HexColor("2C3246"),
+                            onPrimary: HexColor("2C3246"),
+                            onSurface: HexColor("2C3246"),
+                          ),
+                          onPressed: () => {
+                            typeAlert == "Edit"
+                                ? updateItem(idUpdate.toString())
+                                : createItem(),
+                            Navigator.pop(context),
+                          },
+                          child: Text(
+                            typeAlert == "Edit" ? "Simpan Data" : "Tambah Data",
+                            style: TextStyle(color: Colors.white, fontSize: 20),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ]),
+            );
+          });
+    });
+
+    // showBarModalBottomSheet(
+    //     enableDrag: true,
+    //     isDismissible: false,
+    //     context: context,
+    //     builder: (context) {
+    //       return
+    //     });
+    // // AwesomeDialog(
+    // //   context: context,
+    // //   onDissmissCallback: (type) {
+    // //     edited = false;
+    // //     imageTemp = null;
+    // //     namaBarang.text = "";
+    // //     hargaBarang.text = "";
+    // //     stock.text = "";
+    // //     unitChoose = "1";
+    // //     deskipsi.text = "";
+    // //   },
+    // //   dialogType: DialogType.NO_HEADER,
+    // //   animType: AnimType.SCALE,
+    // //   headerAnimationLoop: false,
+    // //   title: 'Warning',
+    // //   desc: "Anda yakin ingin menghapus data?",
+    // //   body: Padding(
+    // //     padding: const EdgeInsets.all(15.0),
+    // //     child: Column(
+    // //       children: <Widget>[
+    // //         Align(
+    // //           alignment: const Alignment(0, 1),
+    // //           child: Column(
+    // //             mainAxisSize: MainAxisSize.min,
+    // //             children: [
+    // //               CircleAvatar(
+    // //                   backgroundColor: Colors.white,
+    // //                   radius: 55,
+    // //                   child: Hero(
+    // //                     tag: "pp",
+    // //                     child: imageTemp != null
+    // //                         ? CircleAvatar(
+    // //                             backgroundColor: Colors.black38,
+    // //                             backgroundImage: MemoryImage(imageTemp!),
+    // //                             radius: 100.0,
+    // //                           )
+    // //                         : edited
+    // //                             ? Image.network(
+    // //                                 tempData[id]['image']['path'].toString(),
+    // //                                 width: 200)
+    // //                             : const CircleAvatar(
+    // //                                 backgroundColor: Colors.black38,
+    // //                                 backgroundImage: null,
+    // //                                 radius: 100.0,
+    // //                               ),
+    // //                   )),
+    // //             ],
+    // //           ),
+    // //         ),
+    // //         Align(
+    // //           alignment: Alignment.center,
+    // //           // ignore: sized_box_for_whitespace
+    // //           child: Container(
+    // //             width: MediaQuery.of(context).size.width * 0.3,
+    // //             child: ElevatedButton(
+    // //               style: ElevatedButton.styleFrom(
+    // //                 primary: Colors.blue,
+    // //                 onPrimary: Colors.grey,
+    // //                 onSurface: Colors.black,
+    // //               ),
+    // //               onPressed: () {
+    // //                 // if (typeAlert == "Edit") {
+    // //                 edited = true;
+    // //                 // } else {
+    // //                 // edited = true;
+    // //                 // }
+    // //                 Navigator.pop(context);
+    // //                 popUpCamera();
+    // //               },
+    // //               child: Container(
+    // //                 alignment: Alignment.center,
+    // //                 child: Container(
+    // //                   child: Row(
+    // //                     children: const <Widget>[
+    // //                       Icon(
+    // //                         Icons.camera_alt,
+    // //                         color: Colors.white,
+    // //                       ),
+    // //                       SizedBox(
+    // //                         width: 5,
+    // //                       ),
+    // //                       Text(
+    // //                         "Tambah",
+    // //                         textAlign: TextAlign.center,
+    // //                         style: TextStyle(color: Colors.white, fontSize: 15),
+    // //                       ),
+    // //                     ],
+    // //                   ),
+    // //                 ),
+    // //               ),
+    // //             ),
+    // //           ),
+    // //         ),
+    // //         TextField(
+    // //           controller: namaBarang,
+    // //           keyboardType: TextInputType.text,
+    // //           decoration: const InputDecoration(
+    // //               icon: Icon(Icons.production_quantity_limits),
+    // //               labelText: "Nama Barang"),
+    // //         ),
+    // //         TextField(
+    // //           controller: hargaBarang,
+    // //           keyboardType: TextInputType.number,
+    // //           decoration: const InputDecoration(
+    // //             icon: Icon(Icons.monetization_on),
+    // //             labelText: "Harga barang",
+    // //           ),
+    // //         ),
+    // //         TextField(
+    // //           keyboardType: TextInputType.number,
+    // //           controller: stock,
+    // //           decoration: const InputDecoration(
+    // //             icon: Icon(Icons.confirmation_number),
+    // //             labelText: "Stock",
+    // //           ),
+    // //         ),
+    // //         Container(
+    // //           width: double.infinity,
+    // //           child: Row(
+    // //             children: [
+    // //               Icon(
+    // //                 Icons.ac_unit,
+    // //                 color: Colors.grey,
+    // //               ),
+    // //               SizedBox(
+    // //                 width: 15,
+    // //               ),
+    // //               Expanded(
+    // //                 flex: 1,
+    // //                 child: DropdownButtonFormField<String>(
+    // //                   isExpanded: true,
+    // //                   items: list_unit.map<DropdownMenuItem<String>>((items) {
+    // //                     return DropdownMenuItem(
+    // //                         value: items['id'].toString(),
+    // //                         child: Text(items['name']));
+    // //                   }).toList(),
+    // //                   value: unitChoose,
+    // //                   onChanged: (val) => setState(() {
+    // //                     unitChoose = val.toString();
+    // //                   }),
+    // //                   onSaved: (val) => setState(() {
+    // //                     unitChoose = val.toString();
+    // //                   }),
+    // //                   hint: Text(
+    // //                     "Select Item",
+    // //                     style: TextStyle(color: Colors.grey),
+    // //                     textAlign: TextAlign.end,
+    // //                   ),
+    // //                   icon: Padding(
+    // //                       //Icon at tail, arrow bottom is default icon
+    // //                       padding: EdgeInsets.only(left: 20),
+    // //                       child: Icon(Icons.arrow_downward)),
+    // //                   style: TextStyle(
+    // //                     color:
+    // //                         unitChoose == "" ? Colors.grey[800] : Colors.black,
+    // //                   ),
+    // //                 ),
+    // //               ),
+    // //             ],
+    // //           ),
+    // //         ),
+    // //         Container(
+    // //           width: double.infinity,
+    // //           child: Row(
+    // //             children: [
+    // //               Icon(
+    // //                 Icons.medical_services,
+    // //                 color: Colors.grey,
+    // //               ),
+    // //               SizedBox(
+    // //                 width: 15,
+    // //               ),
+    // //               Expanded(
+    // //                 flex: 1,
+    // //                 child: DropdownButtonFormField<String>(
+    // //                   isExpanded: true,
+    // //                   items: apotekList.map<DropdownMenuItem<String>>((items) {
+    // //                     return DropdownMenuItem(
+    // //                         value: items['id'].toString(),
+    // //                         child: Text(items['name']));
+    // //                   }).toList(),
+    // //                   value: selectApotek,
+    // //                   onChanged: (val) => setState(() {
+    // //                     selectApotek = val.toString();
+    // //                   }),
+    // //                   onSaved: (val) => setState(() {
+    // //                     selectApotek = val.toString();
+    // //                   }),
+    // //                   hint: Text(
+    // //                     "Select Item",
+    // //                     style: TextStyle(color: Colors.grey),
+    // //                     textAlign: TextAlign.end,
+    // //                   ),
+    // //                   icon: Padding(
+    // //                       //Icon at tail, arrow bottom is default icon
+    // //                       padding: EdgeInsets.only(left: 20),
+    // //                       child: Icon(Icons.arrow_downward)),
+    // //                   style: TextStyle(
+    // //                     color: selectApotek == ""
+    // //                         ? Colors.grey[800]
+    // //                         : Colors.black,
+    // //                   ),
+    // //                 ),
+    // //               ),
+    // //             ],
+    // //           ),
+    // //         ),
+    // //         TextField(
+    // //           keyboardType: TextInputType.text,
+    // //           controller: deskipsi,
+    // //           decoration: const InputDecoration(
+    // //             icon: Icon(Icons.description),
+    // //             labelText: "Deskrispi",
+    // //           ),
+    // //         ),
+    // //       ],
+    // //     ),
+    // //   ),
+    // //   btnOk: DialogButton(
+    // //     onPressed: () => {
+    // //       typeAlert == "Edit" ? updateItem(idUpdate.toString()) : createItem(),
+    // //       Navigator.pop(context),
+    // //     },
+    // //     child: Text(
+    // //       typeAlert == "Edit" ? "Simpan Data" : "Tambah Data",
+    // //       style: const TextStyle(color: Colors.white, fontSize: 20),
+    // //     ),
+    // //   ),
+    // //   btnOkOnPress: () {},
+    // // ).show();
   }
 
   @override
@@ -787,7 +944,7 @@ class MedicineAdminState extends State<MedicineAdmin> {
           title: const Text("Obat Herbal"),
         ),
         floatingActionButton: FloatingActionButton(
-          backgroundColor: HexColor("2C3246"),
+            backgroundColor: HexColor("2C3246"),
             child: Icon(Icons.add),
             onPressed: () {
               AlertData("false");
@@ -820,214 +977,258 @@ class MedicineAdminState extends State<MedicineAdmin> {
                   ))
               : Stack(
                   children: <Widget>[
-                    Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: <Widget>[
-                          Padding(
-                            padding: const EdgeInsets.all(10.0),
-                            child: TextField(
-                              onEditingComplete: () => getItem(),
-                              controller: find,
-                              keyboardType: TextInputType.text,
-                              decoration: const InputDecoration(
-                                  prefixIcon: Icon(Icons.search),
-                                  border: OutlineInputBorder(),
-                                  labelText: "Cari Obat"),
-                            ),
-                          ),
-                          Expanded(
-                            flex: 1,
-                            child: ListView(
-                              scrollDirection: Axis.vertical,
-                              physics: const AlwaysScrollableScrollPhysics(),
-                              shrinkWrap: true,
-                              padding: const EdgeInsets.all(5.0),
-                              children: <Widget>[
-                                Container(
-                                    margin: const EdgeInsets.all(2),
-                                    alignment: Alignment.topCenter,
-                                    child: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          for (int index = 0;
-                                              index < tempData.length;
-                                              index++)
-                                            Container(
-                                              margin:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 5,
-                                                      vertical: 5),
-                                              decoration: BoxDecoration(
-                                                border: Border.all(
-                                                  color: Colors.black12,
-                                                  width: 2,
-                                                ),
-                                                borderRadius:
-                                                    BorderRadius.circular(12),
-                                              ),
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        vertical: 7,
-                                                        horizontal: 10),
-                                                child: Row(children: [
-                                                  Expanded(
-                                                    flex: 1,
-                                                    child: Image.network(
-                                                      tempData[index]['image']
-                                                              ['path']
-                                                          .toString(),
-                                                      width: 200,
+                    tempData.length == 0
+                        ? Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Center(
+                                  child: SvgPicture.asset(
+                                'assets/images/empty.svg',
+                                height: 150,
+                              )),
+                              SizedBox(
+                                height: 20,
+                              ),
+                              Center(child: Text("Data Kosong"))
+                            ],
+                          )
+                        : Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: <Widget>[
+                                Padding(
+                                  padding: const EdgeInsets.all(10.0),
+                                  child: TextField(
+                                    onEditingComplete: () => getItem(),
+                                    controller: find,
+                                    keyboardType: TextInputType.text,
+                                    decoration: const InputDecoration(
+                                        prefixIcon: Icon(Icons.search),
+                                        border: OutlineInputBorder(),
+                                        labelText: "Cari Obat"),
+                                  ),
+                                ),
+                                Expanded(
+                                  flex: 1,
+                                  child: ListView(
+                                    scrollDirection: Axis.vertical,
+                                    physics:
+                                        const AlwaysScrollableScrollPhysics(),
+                                    shrinkWrap: true,
+                                    padding: const EdgeInsets.all(5.0),
+                                    children: <Widget>[
+                                      Container(
+                                          margin: const EdgeInsets.all(2),
+                                          alignment: Alignment.topCenter,
+                                          child: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                for (int index = 0;
+                                                    index < tempData.length;
+                                                    index++)
+                                                  Container(
+                                                    margin: const EdgeInsets
+                                                            .symmetric(
+                                                        horizontal: 5,
+                                                        vertical: 5),
+                                                    decoration: BoxDecoration(
+                                                      border: Border.all(
+                                                        color: Colors.black12,
+                                                        width: 2,
+                                                      ),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              12),
+                                                    ),
+                                                    child: Padding(
+                                                      padding: const EdgeInsets
+                                                              .symmetric(
+                                                          vertical: 7,
+                                                          horizontal: 10),
+                                                      child: Row(children: [
+                                                        Expanded(
+                                                          flex: 1,
+                                                          child: Image.network(
+                                                            tempData[index][
+                                                                        'image']
+                                                                    ['path']
+                                                                .toString(),
+                                                            width: 200,
+                                                          ),
+                                                        ),
+                                                        Expanded(
+                                                            flex: 1,
+                                                            child: Padding(
+                                                              padding: const EdgeInsets
+                                                                      .symmetric(
+                                                                  horizontal:
+                                                                      10),
+                                                              child: Text(
+                                                                  tempData[index][
+                                                                          'name']
+                                                                      .toString(),
+                                                                  textAlign:
+                                                                      TextAlign
+                                                                          .start,
+                                                                  style: const TextStyle(
+                                                                      fontFamily:
+                                                                          'Nunito',
+                                                                      color: Colors
+                                                                          .black,
+                                                                      fontSize:
+                                                                          12,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold,
+                                                                      decoration:
+                                                                          TextDecoration
+                                                                              .none)),
+                                                            )),
+                                                        Expanded(
+                                                            flex: 1,
+                                                            child: Padding(
+                                                              padding: const EdgeInsets
+                                                                      .symmetric(
+                                                                  horizontal:
+                                                                      10),
+                                                              child: Text(
+                                                                  tempData[index]
+                                                                          ['data_apotek']
+                                                                      ['name'],
+                                                                  textAlign:
+                                                                      TextAlign
+                                                                          .start,
+                                                                  style: const TextStyle(
+                                                                      fontFamily:
+                                                                          'Nunito',
+                                                                      color: Colors
+                                                                          .black,
+                                                                      fontSize:
+                                                                          12,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .normal,
+                                                                      decoration:
+                                                                          TextDecoration
+                                                                              .none)),
+                                                            )),
+                                                        Expanded(
+                                                            flex: 1,
+                                                            child:
+                                                                ElevatedButton(
+                                                                    child:
+                                                                        const Align(
+                                                                      alignment:
+                                                                          Alignment
+                                                                              .bottomCenter,
+                                                                      child: Icon(
+                                                                          Icons
+                                                                              .delete,
+                                                                          color:
+                                                                              Colors.white),
+                                                                    ),
+                                                                    style: ElevatedButton
+                                                                        .styleFrom(
+                                                                      primary:
+                                                                          HexColor(
+                                                                              "2C3246"),
+                                                                      onPrimary:
+                                                                          HexColor(
+                                                                              "2C3246"),
+                                                                      onSurface:
+                                                                          HexColor(
+                                                                              "2C3246"),
+                                                                      shape: RoundedRectangleBorder(
+                                                                          borderRadius:
+                                                                              BorderRadius.circular(18.0)),
+                                                                    ),
+                                                                    onPressed: () =>
+                                                                        deleteAlert(tempData[index]
+                                                                            [
+                                                                            'id']))),
+                                                        SizedBox(
+                                                          width: windowWidth *
+                                                              0.02,
+                                                        ),
+                                                        Expanded(
+                                                            flex: 1,
+                                                            child:
+                                                                ElevatedButton(
+                                                                    child:
+                                                                        const Align(
+                                                                      alignment:
+                                                                          Alignment
+                                                                              .center,
+                                                                      child:
+                                                                          Icon(
+                                                                        Icons
+                                                                            .edit,
+                                                                        color: Colors
+                                                                            .white,
+                                                                      ),
+                                                                    ),
+                                                                    style: ElevatedButton
+                                                                        .styleFrom(
+                                                                      primary:
+                                                                          HexColor(
+                                                                              "2C3246"),
+                                                                      onPrimary:
+                                                                          HexColor(
+                                                                              "2C3246"),
+                                                                      onSurface:
+                                                                          HexColor(
+                                                                              "2C3246"),
+                                                                      shape: RoundedRectangleBorder(
+                                                                          borderRadius:
+                                                                              BorderRadius.circular(18.0)),
+                                                                    ),
+                                                                    onPressed:
+                                                                        () => {
+                                                                              setState(() {
+                                                                                id = index;
+                                                                                idUpdate = tempData[index]['id'];
+                                                                              }),
+                                                                              AlertData("Edit"),
+                                                                            })),
+                                                      ]),
                                                     ),
                                                   ),
-                                                  Expanded(
-                                                      flex: 1,
-                                                      child: Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                    .symmetric(
-                                                                horizontal: 10),
-                                                        child: Text(
-                                                            tempData[index]
-                                                                    ['name']
-                                                                .toString(),
-                                                            textAlign:
-                                                                TextAlign.start,
-                                                            style: const TextStyle(
-                                                                fontFamily:
-                                                                    'Nunito',
-                                                                color: Colors
-                                                                    .black,
-                                                                fontSize: 12,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                                decoration:
-                                                                    TextDecoration
-                                                                        .none)),
-                                                      )),
-                                                  Expanded(
-                                                      flex: 1,
-                                                      child: Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                    .symmetric(
-                                                                horizontal: 10),
-                                                        child: Text(
-                                                            tempData[index][
-                                                                    'data_apotek']
-                                                                ['name'],
-                                                            textAlign: TextAlign
-                                                                .start,
-                                                            style: const TextStyle(
-                                                                fontFamily:
-                                                                    'Nunito',
-                                                                color: Colors
-                                                                    .black,
-                                                                fontSize: 12,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .normal,
-                                                                decoration:
-                                                                    TextDecoration
-                                                                        .none)),
-                                                      )),
-                                                  Expanded(
-                                                      flex: 1,
-                                                      child: ElevatedButton(
-                                                          child: const Align(
-                                                            alignment: Alignment
-                                                                .bottomCenter,
-                                                            child: Icon(
-                                                                Icons.delete),
-                                                          ),
-                                                          style: ButtonStyle(
-                                                              shape: MaterialStateProperty.all<
-                                                                      RoundedRectangleBorder>(
-                                                                  RoundedRectangleBorder(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        20.0),
-                                                          ))),
-                                                          onPressed: () =>
-                                                              deleteAlert(
-                                                                  tempData[
-                                                                          index]
-                                                                      ['id']))),
-                                                  SizedBox(
-                                                    width: windowWidth * 0.02,
-                                                  ),
-                                                  Expanded(
-                                                      flex: 1,
-                                                      child: ElevatedButton(
-                                                          child: const Align(
-                                                            alignment: Alignment
-                                                                .center,
-                                                            child: Icon(
-                                                                Icons.edit),
-                                                          ),
-                                                          style: ButtonStyle(
-                                                              shape: MaterialStateProperty.all<
-                                                                      RoundedRectangleBorder>(
-                                                                  RoundedRectangleBorder(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        18.0),
-                                                          ))),
-                                                          onPressed: () => {
-                                                                setState(() {
-                                                                  id = index;
-                                                                  idUpdate =
-                                                                      tempData[
-                                                                              index]
-                                                                          [
-                                                                          'id'];
-                                                                }),
-                                                                AlertData(
-                                                                    "Edit"),
-                                                              })),
-                                                ]),
-                                              ),
-                                            ),
-                                        ])),
-                                SizedBox(
-                                  height: windowHeight * 0.02,
-                                ),
-                                // Container(
-                                //   margin: const EdgeInsets.symmetric(
-                                //       horizontal: 15),
-                                //   child: ElevatedButton(
-                                //       onPressed: () => {
-                                //             AlertData("false"),
-                                //             setState(() {
-                                //               id = tempData.length;
-                                //             })
-                                //           },
-                                //       child: Padding(
-                                //           padding: const EdgeInsets.all(10),
-                                //           // ignore: sized_box_for_whitespace
-                                //           child: Container(
-                                //             width: windowWidth * 0.8,
-                                //             child: Column(
-                                //               children: <Widget>[
-                                //                 const Icon(
-                                //                   Icons.add,
-                                //                   size: 25,
-                                //                 ),
-                                //                 SizedBox(
-                                //                   height: windowHeight * 0.01,
-                                //                 ),
-                                //                 const Text("Tambah Barang")
-                                //               ],
-                                //             ),
-                                //           ))),
-                                // ),
-                              ],
-                            ),
-                          )
-                        ]),
+                                              ])),
+                                      SizedBox(
+                                        height: windowHeight * 0.02,
+                                      ),
+                                      // Container(
+                                      //   margin: const EdgeInsets.symmetric(
+                                      //       horizontal: 15),
+                                      //   child: ElevatedButton(
+                                      //       onPressed: () => {
+                                      //             AlertData("false"),
+                                      //             setState(() {
+                                      //               id = tempData.length;
+                                      //             })
+                                      //           },
+                                      //       child: Padding(
+                                      //           padding: const EdgeInsets.all(10),
+                                      //           // ignore: sized_box_for_whitespace
+                                      //           child: Container(
+                                      //             width: windowWidth * 0.8,
+                                      //             child: Column(
+                                      //               children: <Widget>[
+                                      //                 const Icon(
+                                      //                   Icons.add,
+                                      //                   size: 25,
+                                      //                 ),
+                                      //                 SizedBox(
+                                      //                   height: windowHeight * 0.01,
+                                      //                 ),
+                                      //                 const Text("Tambah Barang")
+                                      //               ],
+                                      //             ),
+                                      //           ))),
+                                      // ),
+                                    ],
+                                  ),
+                                )
+                              ]),
                     (cropProses)
                         ? Container(
                             height: MediaQuery.of(context).size.height,

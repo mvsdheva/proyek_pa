@@ -12,6 +12,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:video_player/video_player.dart';
 // import 'package:video_player/video_player.dart';
+import '';
 
 class HomeListPublic extends StatefulWidget {
   const HomeListPublic({Key? key}) : super(key: key);
@@ -168,6 +169,7 @@ class HomeListPublicState extends State<HomeListPublic> {
                             ),
                             SizedBox(height: 20),
                             ElevatedButton(
+                              key: const Key("play_video"),
                               onPressed: () {
                                 setState(() {
                                   // If the video is playing, pause it.

@@ -1,8 +1,9 @@
-// ignore_for_file: unnecessary_const
+// ignore_for_file: unnecessary_const, prefer_const_constructors, deprecated_member_use
 
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:http/http.dart' as http;
 
@@ -16,6 +17,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:sliding_sheet/sliding_sheet.dart';
 
 class NewsPaperList extends StatefulWidget {
   const NewsPaperList({Key? key}) : super(key: key);
@@ -209,7 +211,7 @@ class NewsPaperListState extends State<NewsPaperList> {
   }
 
   Future<void> _takePic(ImageSource source) async {
-    final pickedFile = await _picker.pickImage(source: source, maxWidth: 600);
+    final pickedFile = await _picker.getImage(source: source, maxWidth: 600);
     if (pickedFile != null) {
       baseImage = "";
       _img = File(pickedFile.path);
@@ -268,6 +270,7 @@ class NewsPaperListState extends State<NewsPaperList> {
         title.text = "";
         author.text = "";
         description.text = "";
+        addImage = false;
         category = "";
       },
       dialogType: DialogType.NO_HEADER,
@@ -311,8 +314,11 @@ class NewsPaperListState extends State<NewsPaperList> {
                     onSurface: HexColor("2C3246"),
                   ),
                   onPressed: () {
-                    popUpCamera();
+                    setState(() {
+                      addImage = true;
+                    });
                     Navigator.pop(context);
+                    popUpCamera();
                   },
                   child: Container(
                     alignment: Alignment.center,
@@ -616,164 +622,220 @@ class NewsPaperListState extends State<NewsPaperList> {
           await networkImageToBase64(tempData[id]['image']['path'].toString());
       baseImage = "data:image/png;base64," + imgBase64Str.toString();
     }
-    showBarModalBottomSheet(
-        enableDrag: true,
-        context: context,
-        builder: (context) {
-          return Container(
-            padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
-            child: Padding(
-              padding: const EdgeInsets.all(15.0),
-              child: Column(
-                children: <Widget>[
-                  Align(
-                    alignment: const Alignment(0, 1),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        CircleAvatar(
-                            backgroundColor: Colors.white,
-                            radius: 55,
-                            child: Hero(
-                                tag: "pp",
-                                child: imageTemp != null
-                                    ? CircleAvatar(
-                                        backgroundColor: Colors.black38,
-                                        backgroundImage:
-                                            MemoryImage(imageTemp!),
-                                        radius: 100.0,
-                                      )
-                                    : Image.network(
-                                        tempData[id]['image']['path']
-                                            .toString(),
-                                        width: 200))),
-                      ],
+
+    showSlidingBottomSheet(context, builder: (context) {
+      return SlidingSheetDialog(
+          cornerRadius: 16,
+          avoidStatusBar: true,
+          snapSpec: SnapSpec(
+            initialSnap: 1,
+            snappings: [0.4, 1],
+          ),
+          headerBuilder: (context, state) => Material(
+                child: Container(
+                  width: double.infinity,
+                  color: HexColor("#2C3246"),
+                  child: Column(mainAxisSize: MainAxisSize.min, children: [
+                    SizedBox(
+                      height: 10,
                     ),
-                  ),
-                  Align(
-                    alignment: Alignment.center,
-                    // ignore: sized_box_for_whitespace
-                    child: Container(
-                      width: MediaQuery.of(context).size.width * 0.3,
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          primary: HexColor("2C3246"),
-                          onPrimary: HexColor("2C3246"),
-                          onSurface: HexColor("2C3246"),
-                        ),
-                        onPressed: () {
-                          Navigator.pop(context);
-                          popUpCamera();
-                        },
-                        child: Container(
-                          alignment: Alignment.center,
-                          // ignore: avoid_unnecessary_containers
-                          child: Container(
+                    Container(
+                      width: 32,
+                      height: 8,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          color: Colors.white),
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                  ]),
+                ),
+              ),
+          builder: (context, state) {
+            return Material(
+              child: ListView(
+                shrinkWrap: true,
+                primary: false,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
+                    child: Padding(
+                      padding: const EdgeInsets.all(15.0),
+                      child: Column(
+                        children: <Widget>[
+                          Align(
+                            alignment: const Alignment(0, 1),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                CircleAvatar(
+                                    backgroundColor: Colors.white,
+                                    radius: 55,
+                                    child: Hero(
+                                        tag: "pp",
+                                        child: imageTemp != null
+                                            ? CircleAvatar(
+                                                backgroundColor: Colors.black38,
+                                                backgroundImage:
+                                                    MemoryImage(imageTemp!),
+                                                radius: 100.0,
+                                              )
+                                            : Image.network(
+                                                tempData[id]['image']['path']
+                                                    .toString(),
+                                                width: 200))),
+                              ],
+                            ),
+                          ),
+                          Align(
+                            alignment: Alignment.center,
+                            // ignore: sized_box_for_whitespace
+                            child: Container(
+                              width: MediaQuery.of(context).size.width * 0.3,
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  primary: HexColor("2C3246"),
+                                  onPrimary: HexColor("2C3246"),
+                                  onSurface: HexColor("2C3246"),
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    addImage = true;
+                                  });
+                                  Navigator.pop(context);
+                                  popUpCamera();
+                                },
+                                child: Container(
+                                  alignment: Alignment.center,
+                                  // ignore: avoid_unnecessary_containers
+                                  child: Container(
+                                    child: Row(
+                                      children: const <Widget>[
+                                        Icon(
+                                          Icons.camera_alt,
+                                          color: Colors.white,
+                                        ),
+                                        SizedBox(
+                                          width: 5,
+                                        ),
+                                        Text(
+                                          "Tambah",
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 15),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          TextField(
+                            controller: title,
+                            keyboardType: TextInputType.text,
+                            decoration: const InputDecoration(
+                                icon: Icon(Icons.label_important_rounded),
+                                labelText: "Judul Berita"),
+                          ),
+                          TextField(
+                            controller: author,
+                            keyboardType: TextInputType.text,
+                            decoration: const InputDecoration(
+                              icon: Icon(Icons.account_circle),
+                              labelText: "Author",
+                            ),
+                          ),
+                          TextField(
+                            keyboardType: TextInputType.text,
+                            controller: description,
+                            decoration: const InputDecoration(
+                              icon: Icon(Icons.details),
+                              labelText: "Description",
+                            ),
+                          ),
+                          // ignore: sized_box_for_whitespace
+                          Container(
+                            width: double.infinity,
                             child: Row(
-                              children: const <Widget>[
-                                Icon(
-                                  Icons.camera_alt,
-                                  color: Colors.white,
+                              children: [
+                                const Icon(
+                                  Icons.medical_services,
+                                  color: Colors.grey,
                                 ),
-                                SizedBox(
-                                  width: 5,
+                                const SizedBox(
+                                  width: 15,
                                 ),
-                                Text(
-                                  "Tambah",
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                      color: Colors.white, fontSize: 15),
+                                Expanded(
+                                  flex: 1,
+                                  child: DropdownButtonFormField<String>(
+                                    isExpanded: true,
+                                    items: optCategory
+                                        .map<DropdownMenuItem<String>>((items) {
+                                      return DropdownMenuItem(
+                                          value: items['val'].toString(),
+                                          child:
+                                              Text(items['name'].toString()));
+                                    }).toList(),
+                                    value: category,
+                                    onChanged: (val) => setState(() {
+                                      category = val.toString();
+                                    }),
+                                    onSaved: (val) => setState(() {
+                                      category = val.toString();
+                                    }),
+                                    hint: const Text(
+                                      "Select Item",
+                                      style: TextStyle(color: Colors.grey),
+                                      textAlign: TextAlign.end,
+                                    ),
+                                    icon: const Padding(
+                                        //Icon at tail, arrow bottom is default icon
+                                        padding: EdgeInsets.only(left: 20),
+                                        child: Icon(Icons.arrow_downward)),
+                                    style: TextStyle(
+                                      color: category == ""
+                                          ? Colors.grey[800]
+                                          : Colors.black,
+                                    ),
+                                  ),
                                 ),
                               ],
                             ),
                           ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  TextField(
-                    controller: title,
-                    keyboardType: TextInputType.text,
-                    decoration: const InputDecoration(
-                        icon: Icon(Icons.label_important_rounded),
-                        labelText: "Judul Berita"),
-                  ),
-                  TextField(
-                    controller: author,
-                    keyboardType: TextInputType.text,
-                    decoration: const InputDecoration(
-                      icon: Icon(Icons.account_circle),
-                      labelText: "Author",
-                    ),
-                  ),
-                  TextField(
-                    keyboardType: TextInputType.text,
-                    controller: description,
-                    decoration: const InputDecoration(
-                      icon: Icon(Icons.details),
-                      labelText: "Description",
-                    ),
-                  ),
-                  // ignore: sized_box_for_whitespace
-                  Container(
-                    width: double.infinity,
-                    child: Row(
-                      children: [
-                        const Icon(
-                          Icons.medical_services,
-                          color: Colors.grey,
-                        ),
-                        const SizedBox(
-                          width: 15,
-                        ),
-                        Expanded(
-                          flex: 1,
-                          child: DropdownButtonFormField<String>(
-                            isExpanded: true,
-                            items: optCategory
-                                .map<DropdownMenuItem<String>>((items) {
-                              return DropdownMenuItem(
-                                  value: items['val'].toString(),
-                                  child: Text(items['name'].toString()));
-                            }).toList(),
-                            value: category,
-                            onChanged: (val) => setState(() {
-                              category = val.toString();
-                            }),
-                            onSaved: (val) => setState(() {
-                              category = val.toString();
-                            }),
-                            hint: const Text(
-                              "Select Item",
-                              style: TextStyle(color: Colors.grey),
-                              textAlign: TextAlign.end,
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              primary: HexColor("2C3246"),
+                              onPrimary: HexColor("2C3246"),
+                              onSurface: HexColor("2C3246"),
                             ),
-                            icon: const Padding(
-                                //Icon at tail, arrow bottom is default icon
-                                padding: EdgeInsets.only(left: 20),
-                                child: Icon(Icons.arrow_downward)),
-                            style: TextStyle(
-                              color: category == ""
-                                  ? Colors.grey[800]
-                                  : Colors.black,
+                            onPressed: () {
+                              updateItem(idUpdate.toString());
+                              Navigator.pop(context);
+                            },
+                            child: const Text(
+                              'Simpan',
+                              style: TextStyle(color: Colors.white),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      updateItem(idUpdate.toString());
-                      Navigator.pop(context);
-                    },
-                    child: const Text('Simpan'),
-                  ),
+                  )
                 ],
               ),
-            ),
-          );
-        });
+            );
+          });
+    });
+
+    // showBarModalBottomSheet(
+    //     enableDrag: true,
+    //     context: context,
+    //     builder: (context) {
+    //       return
+    //     });
   }
 
   // ignore: unused_element
@@ -785,199 +847,250 @@ class NewsPaperListState extends State<NewsPaperList> {
     if (addImage = false) {
       imageTemp = null;
     }
-    showBarModalBottomSheet(
-        enableDrag: true,
-        context: context,
-        builder: (context) {
-          return Container(
-            padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
-            child: Padding(
-              padding: const EdgeInsets.all(15.0),
-              child: Column(
-                children: <Widget>[
-                  Align(
-                    alignment: const Alignment(0, 1),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        CircleAvatar(
-                            backgroundColor: Colors.white,
-                            radius: 55,
-                            child: Hero(
-                                tag: "pp",
-                                child: imageTemp != null
-                                    ? CircleAvatar(
-                                        backgroundColor: Colors.black38,
-                                        backgroundImage:
-                                            MemoryImage(imageTemp!),
-                                        radius: 100.0,
-                                      )
-                                    : const CircleAvatar(
-                                        backgroundColor: Colors.black38,
-                                        backgroundImage: null,
-                                        radius: 100.0,
-                                      )))
-                      ],
+
+    showSlidingBottomSheet(context, builder: (context) {
+      return SlidingSheetDialog(
+          cornerRadius: 16,
+          avoidStatusBar: true,
+          snapSpec: SnapSpec(
+            initialSnap: 1,
+            snappings: [0.4, 1],
+          ),
+          headerBuilder: (context, state) => Material(
+                child: Container(
+                  width: double.infinity,
+                  color: HexColor("#2C3246"),
+                  child: Column(mainAxisSize: MainAxisSize.min, children: [
+                    SizedBox(
+                      height: 10,
                     ),
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Align(
-                    alignment: Alignment.center,
-                    // ignore: sized_box_for_whitespace
-                    child: Container(
-                      width: MediaQuery.of(context).size.width * 0.3,
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          primary: HexColor("2C3246"),
-                          onPrimary: HexColor("2C3246"),
-                          onSurface: HexColor("2C3246"),
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            addImage = true;
-                          });
-                          Navigator.pop(context);
-                          popUpCamera();
-                        },
-                        child: Container(
-                          alignment: Alignment.center,
-                          child: Container(
-                            child: Row(
-                              children: const <Widget>[
-                                Icon(
-                                  Icons.camera_alt,
-                                  color: Colors.white,
-                                ),
-                                SizedBox(
-                                  width: 5,
-                                ),
-                                Text(
-                                  "Tambah",
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                      color: Colors.white, fontSize: 15),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
+                    Container(
+                      width: 32,
+                      height: 8,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          color: Colors.white),
                     ),
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Container(
-                    child: TextField(
-                      controller: title,
-                      keyboardType: TextInputType.text,
-                      decoration: const InputDecoration(
-                          border: OutlineInputBorder(),
-                          icon: Icon(Icons.label_important_rounded),
-                          labelText: "Judul Berita"),
+                    SizedBox(
+                      height: 10,
                     ),
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Container(
-                    child: TextField(
-                      controller: author,
-                      keyboardType: TextInputType.text,
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        icon: Icon(Icons.account_circle),
-                        labelText: "Author",
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Container(
-                    width: double.infinity,
-                    child: Row(
-                      children: [
-                        const Icon(
-                          Icons.medical_services,
-                          color: Colors.grey,
-                        ),
-                        const SizedBox(
-                          width: 15,
-                        ),
-                        Expanded(
-                          flex: 1,
-                          child: DropdownButtonFormField<String>(
-                            decoration:
-                                InputDecoration(border: OutlineInputBorder()),
-                            isExpanded: true,
-                            items: optCategory
-                                .map<DropdownMenuItem<String>>((items) {
-                              return DropdownMenuItem(
-                                  value: items['val'].toString(),
-                                  child: Text(items['name'].toString()));
-                            }).toList(),
-                            value: category,
-                            onChanged: (val) => setState(() {
-                              category = val.toString();
-                            }),
-                            onSaved: (val) => setState(() {
-                              category = val.toString();
-                            }),
-                            hint: const Text(
-                              "Select Item",
-                              style: TextStyle(color: Colors.grey),
-                              textAlign: TextAlign.end,
-                            ),
-                            icon: const Padding(
-                                //Icon at tail, arrow bottom is default icon
-                                padding: EdgeInsets.only(left: 20),
-                                child: Icon(Icons.arrow_downward)),
-                            style: TextStyle(
-                              color: category == ""
-                                  ? Colors.grey[800]
-                                  : Colors.black,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Container(
-                    child: TextField(
-                      keyboardType: TextInputType.multiline,
-                      minLines: 5,
-                      maxLines: 5,
-                      controller: description,
-                      decoration: const InputDecoration(
-                        contentPadding: EdgeInsets.symmetric(horizontal: 15),
-                        border: OutlineInputBorder(),
-                        icon: Icon(Icons.details),
-                        labelText: "Description",
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      createItem();
-                      Navigator.pop(context);
-                    },
-                    child: const Text('Tambah Data'),
-                  ),
-                  // ignore: sized_box_for_whitespace
-                ],
+                  ]),
+                ),
               ),
-            ),
-          );
-        });
+          builder: (context, state) {
+            return Material(
+                child: ListView(
+              shrinkWrap: true,
+              primary: false,
+              children: [
+                Container(
+                  padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
+                  child: Padding(
+                    padding: const EdgeInsets.all(15.0),
+                    child: Column(
+                      children: <Widget>[
+                        Align(
+                          alignment: const Alignment(0, 1),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              CircleAvatar(
+                                  backgroundColor: Colors.white,
+                                  radius: 55,
+                                  child: Hero(
+                                      tag: "pp",
+                                      child: imageTemp != null
+                                          ? CircleAvatar(
+                                              backgroundColor: Colors.black38,
+                                              backgroundImage:
+                                                  MemoryImage(imageTemp!),
+                                              radius: 100.0,
+                                            )
+                                          : const CircleAvatar(
+                                              backgroundColor: Colors.black38,
+                                              backgroundImage: null,
+                                              radius: 100.0,
+                                            )))
+                            ],
+                          ),
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Align(
+                          alignment: Alignment.center,
+                          // ignore: sized_box_for_whitespace
+                          child: Container(
+                            width: MediaQuery.of(context).size.width * 0.3,
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                primary: HexColor("2C3246"),
+                                onPrimary: HexColor("2C3246"),
+                                onSurface: HexColor("2C3246"),
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  addImage = true;
+                                });
+                                Navigator.pop(context);
+                                popUpCamera();
+                              },
+                              child: Container(
+                                alignment: Alignment.center,
+                                child: Container(
+                                  child: Row(
+                                    children: const <Widget>[
+                                      Icon(
+                                        Icons.camera_alt,
+                                        color: Colors.white,
+                                      ),
+                                      SizedBox(
+                                        width: 5,
+                                      ),
+                                      Text(
+                                        "Tambah",
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                            color: Colors.white, fontSize: 15),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Container(
+                          child: TextField(
+                            controller: title,
+                            keyboardType: TextInputType.text,
+                            decoration: const InputDecoration(
+                                border: OutlineInputBorder(),
+                                icon: Icon(Icons.label_important_rounded),
+                                labelText: "Judul Berita"),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Container(
+                          child: TextField(
+                            controller: author,
+                            keyboardType: TextInputType.text,
+                            decoration: const InputDecoration(
+                              border: OutlineInputBorder(),
+                              icon: Icon(Icons.account_circle),
+                              labelText: "Author",
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Container(
+                          width: double.infinity,
+                          child: Row(
+                            children: [
+                              const Icon(
+                                Icons.medical_services,
+                                color: Colors.grey,
+                              ),
+                              const SizedBox(
+                                width: 15,
+                              ),
+                              Expanded(
+                                flex: 1,
+                                child: DropdownButtonFormField<String>(
+                                  decoration: InputDecoration(
+                                      border: OutlineInputBorder()),
+                                  isExpanded: true,
+                                  items: optCategory
+                                      .map<DropdownMenuItem<String>>((items) {
+                                    return DropdownMenuItem(
+                                        value: items['val'].toString(),
+                                        child: Text(items['name'].toString()));
+                                  }).toList(),
+                                  value: category,
+                                  onChanged: (val) => setState(() {
+                                    category = val.toString();
+                                  }),
+                                  onSaved: (val) => setState(() {
+                                    category = val.toString();
+                                  }),
+                                  hint: const Text(
+                                    "Select Item",
+                                    style: TextStyle(color: Colors.grey),
+                                    textAlign: TextAlign.end,
+                                  ),
+                                  icon: const Padding(
+                                      //Icon at tail, arrow bottom is default icon
+                                      padding: EdgeInsets.only(left: 20),
+                                      child: Icon(Icons.arrow_downward)),
+                                  style: TextStyle(
+                                    color: category == ""
+                                        ? Colors.grey[800]
+                                        : Colors.black,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Container(
+                          child: TextField(
+                            keyboardType: TextInputType.multiline,
+                            minLines: 5,
+                            maxLines: 5,
+                            controller: description,
+                            decoration: const InputDecoration(
+                              contentPadding:
+                                  EdgeInsets.symmetric(horizontal: 15),
+                              border: OutlineInputBorder(),
+                              icon: Icon(Icons.details),
+                              labelText: "Description",
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            primary: HexColor("2C3246"),
+                            onPrimary: HexColor("2C3246"),
+                            onSurface: HexColor("2C3246"),
+                          ),
+                          onPressed: () {
+                            createItem();
+                            Navigator.pop(context);
+                          },
+                          child: const Text(
+                            'Tambah Data',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                        // ignore: sized_box_for_whitespace
+                      ],
+                    ),
+                  ),
+                )
+              ],
+            ));
+          });
+    });
+
+    // showBarModalBottomSheet(
+    //     enableDrag: true,
+    //     context: context,
+    //     builder: (context) {
+    //       return
+    //     });
   }
 
   @override
@@ -993,7 +1106,7 @@ class NewsPaperListState extends State<NewsPaperList> {
             _showFullModal(),
             imageTemp?.clear()
           },
-          backgroundColor: Colors.green,
+          backgroundColor: HexColor("#2C3246"),
           child: const Icon(Icons.add),
         ),
         appBar: AppBar(
@@ -1025,202 +1138,238 @@ class NewsPaperListState extends State<NewsPaperList> {
                   ))
               : Stack(
                   children: <Widget>[
-                    Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: <Widget>[
-                          Expanded(
-                            flex: 1,
-                            child: ListView(
-                              scrollDirection: Axis.vertical,
-                              physics: const AlwaysScrollableScrollPhysics(),
-                              shrinkWrap: true,
-                              padding: const EdgeInsets.all(5.0),
-                              children: <Widget>[
-                                Container(
-                                    margin: const EdgeInsets.all(2),
-                                    alignment: Alignment.topCenter,
-                                    child: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          for (int index = 0;
-                                              index < tempData.length;
-                                              index++)
-                                            Container(
-                                              margin:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 5,
-                                                      vertical: 5),
-                                              decoration: BoxDecoration(
-                                                border: Border.all(
-                                                  color: Colors.black12,
-                                                  width: 2,
-                                                ),
-                                                borderRadius:
-                                                    BorderRadius.circular(12),
-                                              ),
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        vertical: 7,
-                                                        horizontal: 10),
-                                                child: Row(children: [
-                                                  Image.network(
-                                                    tempData[index]['image']
-                                                            ['path']
-                                                        .toString(),
-                                                    width: 70,
-                                                  ),
-                                                  Expanded(
-                                                      flex: 2,
-                                                      child: Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                    .symmetric(
-                                                                horizontal: 10),
-                                                        child: Column(
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .start,
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .start,
-                                                          children: [
-                                                            Text(
-                                                                tempData[index]
-                                                                        [
-                                                                        'title']
-                                                                    .toString(),
-                                                                textAlign:
-                                                                    TextAlign
-                                                                        .start,
-                                                                style: const TextStyle(
-                                                                    fontFamily:
-                                                                        'Nunito',
-                                                                    color: Colors
-                                                                        .black,
-                                                                    fontSize:
-                                                                        12,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .normal,
-                                                                    decoration:
-                                                                        TextDecoration
-                                                                            .none)),
-                                                            Text(
-                                                                tempData[index]
-                                                                        [
-                                                                        'author']
-                                                                    .toString(),
-                                                                textAlign:
-                                                                    TextAlign
-                                                                        .start,
-                                                                style: const TextStyle(
-                                                                    fontFamily:
-                                                                        'Nunito',
-                                                                    color: Colors
-                                                                        .black,
-                                                                    fontSize:
-                                                                        12,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .normal,
-                                                                    decoration:
-                                                                        TextDecoration
-                                                                            .none)),
-                                                            Text(
-                                                                getCustomFormattedDateTime(
-                                                                        tempData[
-                                                                                index]
-                                                                            [
-                                                                            'created_at'],
-                                                                        'dd-MM-yyyy hh:mm a')
-                                                                    .toString(),
-                                                                textAlign:
-                                                                    TextAlign
-                                                                        .start,
-                                                                style: const TextStyle(
-                                                                    fontFamily:
-                                                                        'Nunito',
-                                                                    color: Colors
-                                                                        .black,
-                                                                    fontSize:
-                                                                        12,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .normal,
-                                                                    decoration:
-                                                                        TextDecoration
-                                                                            .none)),
-                                                          ],
+                    tempData.length == 0
+                        ? Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Center(
+                                  child: SvgPicture.asset(
+                                'assets/images/empty.svg',
+                                height: 150,
+                              )),
+                              SizedBox(
+                                height: 20,
+                              ),
+                              Center(child: Text("Data Kosong"))
+                            ],
+                          )
+                        : Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: <Widget>[
+                                Expanded(
+                                  flex: 1,
+                                  child: ListView(
+                                    scrollDirection: Axis.vertical,
+                                    physics:
+                                        const AlwaysScrollableScrollPhysics(),
+                                    shrinkWrap: true,
+                                    padding: const EdgeInsets.all(5.0),
+                                    children: <Widget>[
+                                      Container(
+                                          margin: const EdgeInsets.all(2),
+                                          alignment: Alignment.topCenter,
+                                          child: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                for (int index = 0;
+                                                    index < tempData.length;
+                                                    index++)
+                                                  Container(
+                                                    margin: const EdgeInsets
+                                                            .symmetric(
+                                                        horizontal: 5,
+                                                        vertical: 5),
+                                                    decoration: BoxDecoration(
+                                                      border: Border.all(
+                                                        color: Colors.black12,
+                                                        width: 2,
+                                                      ),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              12),
+                                                    ),
+                                                    child: Padding(
+                                                      padding: const EdgeInsets
+                                                              .symmetric(
+                                                          vertical: 7,
+                                                          horizontal: 10),
+                                                      child: Row(children: [
+                                                        Image.network(
+                                                          tempData[index]
+                                                                      ['image']
+                                                                  ['path']
+                                                              .toString(),
+                                                          width: 70,
                                                         ),
-                                                      )),
-                                                  Expanded(
-                                                      flex: 1,
-                                                      child: ElevatedButton(
-                                                          child: const Align(
-                                                            alignment: Alignment
-                                                                .bottomCenter,
-                                                            child: Icon(
-                                                                Icons.delete),
-                                                          ),
-                                                          style: ButtonStyle(
-                                                              shape: MaterialStateProperty.all<
-                                                                      RoundedRectangleBorder>(
-                                                                  RoundedRectangleBorder(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        20.0),
-                                                          ))),
-                                                          onPressed: () {
-                                                            deleteAlert(
-                                                                tempData[index]
-                                                                    ['id']);
-                                                          })),
-                                                  SizedBox(
-                                                    width: windowWidth * 0.02,
+                                                        Expanded(
+                                                            flex: 2,
+                                                            child: Padding(
+                                                              padding: const EdgeInsets
+                                                                      .symmetric(
+                                                                  horizontal:
+                                                                      10),
+                                                              child: Column(
+                                                                crossAxisAlignment:
+                                                                    CrossAxisAlignment
+                                                                        .start,
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .start,
+                                                                children: [
+                                                                  Text(
+                                                                      tempData[index]
+                                                                              [
+                                                                              'title']
+                                                                          .toString(),
+                                                                      textAlign:
+                                                                          TextAlign
+                                                                              .start,
+                                                                      style: const TextStyle(
+                                                                          fontFamily:
+                                                                              'Nunito',
+                                                                          color: Colors
+                                                                              .black,
+                                                                          fontSize:
+                                                                              12,
+                                                                          fontWeight: FontWeight
+                                                                              .normal,
+                                                                          decoration:
+                                                                              TextDecoration.none)),
+                                                                  Text(
+                                                                      tempData[index]
+                                                                              [
+                                                                              'author']
+                                                                          .toString(),
+                                                                      textAlign:
+                                                                          TextAlign
+                                                                              .start,
+                                                                      style: const TextStyle(
+                                                                          fontFamily:
+                                                                              'Nunito',
+                                                                          color: Colors
+                                                                              .black,
+                                                                          fontSize:
+                                                                              12,
+                                                                          fontWeight: FontWeight
+                                                                              .normal,
+                                                                          decoration:
+                                                                              TextDecoration.none)),
+                                                                  Text(
+                                                                      getCustomFormattedDateTime(
+                                                                              tempData[index][
+                                                                                  'created_at'],
+                                                                              'dd-MM-yyyy hh:mm a')
+                                                                          .toString(),
+                                                                      textAlign:
+                                                                          TextAlign
+                                                                              .start,
+                                                                      style: const TextStyle(
+                                                                          fontFamily:
+                                                                              'Nunito',
+                                                                          color: Colors
+                                                                              .black,
+                                                                          fontSize:
+                                                                              12,
+                                                                          fontWeight: FontWeight
+                                                                              .normal,
+                                                                          decoration:
+                                                                              TextDecoration.none)),
+                                                                ],
+                                                              ),
+                                                            )),
+                                                        Expanded(
+                                                            flex: 1,
+                                                            child:
+                                                                ElevatedButton(
+                                                                    child:
+                                                                        const Align(
+                                                                      alignment:
+                                                                          Alignment
+                                                                              .bottomCenter,
+                                                                      child:
+                                                                          Icon(
+                                                                        Icons
+                                                                            .delete,
+                                                                        color: Colors
+                                                                            .white,
+                                                                      ),
+                                                                    ),
+                                                                    style: ElevatedButton
+                                                                        .styleFrom(
+                                                                      primary:
+                                                                          HexColor(
+                                                                              "2C3246"),
+                                                                      onPrimary:
+                                                                          HexColor(
+                                                                              "2C3246"),
+                                                                      onSurface:
+                                                                          HexColor(
+                                                                              "2C3246"),
+                                                                      shape: RoundedRectangleBorder(
+                                                                          borderRadius:
+                                                                              BorderRadius.circular(20.0)),
+                                                                    ),
+                                                                    onPressed:
+                                                                        () {
+                                                                      deleteAlert(
+                                                                          tempData[index]
+                                                                              [
+                                                                              'id']);
+                                                                    })),
+                                                        SizedBox(
+                                                          width: windowWidth *
+                                                              0.02,
+                                                        ),
+                                                        Expanded(
+                                                            flex: 1,
+                                                            child:
+                                                                ElevatedButton(
+                                                                    child:
+                                                                        const Align(
+                                                                      alignment:
+                                                                          Alignment
+                                                                              .center,
+                                                                      child: Icon(
+                                                                          Icons
+                                                                              .edit,
+                                                                          color:
+                                                                              Colors.white),
+                                                                    ),
+                                                                    style: ElevatedButton
+                                                                        .styleFrom(
+                                                                      primary:
+                                                                          HexColor(
+                                                                              "2C3246"),
+                                                                      onPrimary:
+                                                                          HexColor(
+                                                                              "2C3246"),
+                                                                      onSurface:
+                                                                          HexColor(
+                                                                              "2C3246"),
+                                                                      shape: RoundedRectangleBorder(
+                                                                          borderRadius:
+                                                                              BorderRadius.circular(20.0)),
+                                                                    ),
+                                                                    onPressed:
+                                                                        () => {
+                                                                              setState(() {
+                                                                                id = index;
+                                                                                idUpdate = tempData[index]['id'];
+                                                                                edited = true;
+                                                                              }),
+                                                                              _showEditDataModal(),
+                                                                            }))
+                                                      ]),
+                                                    ),
                                                   ),
-                                                  Expanded(
-                                                      flex: 1,
-                                                      child: ElevatedButton(
-                                                          child: const Align(
-                                                            alignment: Alignment
-                                                                .center,
-                                                            child: Icon(
-                                                                Icons.edit),
-                                                          ),
-                                                          style: ButtonStyle(
-                                                              shape: MaterialStateProperty.all<
-                                                                      RoundedRectangleBorder>(
-                                                                  RoundedRectangleBorder(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        18.0),
-                                                          ))),
-                                                          onPressed: () => {
-                                                                setState(() {
-                                                                  id = index;
-                                                                  idUpdate =
-                                                                      tempData[
-                                                                              index]
-                                                                          [
-                                                                          'id'];
-                                                                  edited = true;
-                                                                }),
-                                                                _showEditDataModal(),
-                                                              }))
-                                                ]),
-                                              ),
-                                            ),
-                                        ])),
-                                SizedBox(
-                                  height: windowHeight * 0.02,
+                                              ])),
+                                      SizedBox(
+                                        height: windowHeight * 0.02,
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                              ],
-                            ),
-                          ),
-                        ]),
+                              ]),
                     (cropProses)
                         ? Container(
                             height: MediaQuery.of(context).size.height,

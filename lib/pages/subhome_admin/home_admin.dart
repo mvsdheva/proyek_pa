@@ -323,10 +323,7 @@ class BerandaAdminState extends State<BerandaAdmin> {
                           decoration: BoxDecoration(
                               color: HexColor("2C3246"),
                               borderRadius: BorderRadius.circular(10)),
-                          child: Container(
-                            padding: EdgeInsets.only(left: 8.0),
-                            alignment: Alignment.centerLeft,
-                            child: Column(
+                          child:  Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
@@ -348,7 +345,6 @@ class BerandaAdminState extends State<BerandaAdmin> {
                                 )
                               ],
                             ),
-                          ),
                         ),
                         SizedBox(height: 10),
                         //obat
@@ -360,10 +356,7 @@ class BerandaAdminState extends State<BerandaAdmin> {
                           decoration: BoxDecoration(
                               color: HexColor("2C3246"),
                               borderRadius: BorderRadius.circular(10)),
-                          child: Container(
-                            padding: EdgeInsets.only(left: 8.0),
-                            alignment: Alignment.centerLeft,
-                            child: Column(
+                          child:  Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
@@ -385,7 +378,6 @@ class BerandaAdminState extends State<BerandaAdmin> {
                                 )
                               ],
                             ),
-                          ),
                         ),
                         SizedBox(height: 10),
                         //apotek
@@ -397,10 +389,7 @@ class BerandaAdminState extends State<BerandaAdmin> {
                           decoration: BoxDecoration(
                               color: HexColor("2C3246"),
                               borderRadius: BorderRadius.circular(10)),
-                          child: Container(
-                            padding: EdgeInsets.only(left: 8.0),
-                            alignment: Alignment.centerLeft,
-                            child: Column(
+                          child:Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
@@ -422,7 +411,6 @@ class BerandaAdminState extends State<BerandaAdmin> {
                                 )
                               ],
                             ),
-                          ),
                         ),
                         SizedBox(height: 10),
                         //radio
@@ -434,10 +422,7 @@ class BerandaAdminState extends State<BerandaAdmin> {
                           decoration: BoxDecoration(
                               color: HexColor("2C3246"),
                               borderRadius: BorderRadius.circular(10)),
-                          child: Container(
-                            padding: EdgeInsets.only(left: 8.0),
-                            alignment: Alignment.centerLeft,
-                            child: Column(
+                          child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
@@ -459,7 +444,6 @@ class BerandaAdminState extends State<BerandaAdmin> {
                                 )
                               ],
                             ),
-                          ),
                         ),
                       ],
                     ),

@@ -5,6 +5,7 @@ import 'dart:ui';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:double_back_to_close_app/double_back_to_close_app.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:herbal/api/api_services.dart';
 import 'package:herbal/pages/auth/authlogin.dart';
@@ -31,6 +32,8 @@ class RadioListPublicState extends State<RadioListPublic> {
   bool isLoading = true;
   var generalData = [];
   Future<void>? _launched;
+
+  bool cropProses = false;
 
   @override
   void initState() {
@@ -151,8 +154,8 @@ class RadioListPublicState extends State<RadioListPublic> {
 
   streamingRadio(index) async {
     final prefs = await SharedPreferences.getInstance();
-    prefs.setString('streamingRadio', jsonEncode(tempData[index]));
-
+    var temp = [index];
+    prefs.setString('streamingRadio', jsonEncode(temp));
     Navigator.push(context,
         MaterialPageRoute(builder: (context) => const RadioDetailsPublic()));
   }
@@ -284,7 +287,8 @@ class RadioListPublicState extends State<RadioListPublic> {
                                                     Text(
                                                         tempData[index]['name']
                                                             .toString(),
-                                                        textAlign: TextAlign.left,
+                                                        textAlign:
+                                                            TextAlign.left,
                                                         style: TextStyle(
                                                             fontSize: 20)),
                                                     // IconButton(
@@ -322,6 +326,15 @@ class RadioListPublicState extends State<RadioListPublic> {
                                 )
                             ]),
                       ),
+                      (cropProses)
+                          ? Container(
+                              height: MediaQuery.of(context).size.height,
+                              width: MediaQuery.of(context).size.width,
+                              color: Colors.black54,
+                              child: const Center(
+                                  child: CircularProgressIndicator()),
+                            )
+                          : const Center(),
                     ]),
             )),
         floatingActionButton: FloatingActionButton.small(

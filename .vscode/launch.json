@@ -7,13 +7,19 @@
 		{
 			"name": "herbal-apps-mobile",
 			"request": "launch",
-			"type": "dart"
+			"type": "dart",
+			"args": [
+				"--no-sound-null-safety"
+			   ]
 		},
 		{
 			"name": "herbal-apps-mobile (profile mode)",
 			"request": "launch",
 			"type": "dart",
-			"flutterMode": "profile"
+			"flutterMode": "profile",
+			"args": [
+				"--no-sound-null-safety"
+			   ]
 		}
 	]
 }

@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:double_back_to_close_app/double_back_to_close_app.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:herbal/api/api_services.dart';
 import 'package:herbal/pages/auth/authlogin.dart';
@@ -14,8 +15,6 @@ import 'package:herbal/shared/shared.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
-// ignore: import_of_legacy_library_into_null_safe
-import 'package:flutter_swiper/flutter_swiper.dart';
 
 class NewsPaperListPublic extends StatefulWidget {
   const NewsPaperListPublic({Key? key}) : super(key: key);
@@ -41,6 +40,8 @@ class NewsPaperListPublicState extends State<NewsPaperListPublic> {
     {'name': 'Sosial dan Budaya', 'val': 'social'}
   ];
   String category = "";
+
+  bool cropProses = false;
   @override
   void initState() {
     super.initState();
@@ -203,222 +204,249 @@ class NewsPaperListPublicState extends State<NewsPaperListPublic> {
               child: SafeArea(
                 child: SingleChildScrollView(
                     physics: const ClampingScrollPhysics(),
-                    child: Column(
+                    child: Stack(
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.all(20.0),
-                          child: DropdownButtonFormField<String>(
-                            decoration: InputDecoration(
-                                border: OutlineInputBorder(
-                                    borderSide:
-                                        BorderSide(color: HexColor("2C3246")),
-                                    borderRadius: BorderRadius.circular(20))),
-                            isExpanded: false,
-                            items: optCategory
-                                .map<DropdownMenuItem<String>>((items) {
-                              return DropdownMenuItem(
-                                  value: items['val'].toString(),
-                                  child: Text(items['name'].toString()));
-                            }).toList(),
-                            value: category,
-                            onChanged: (val) => setState(() {
-                              category = val.toString();
-                              initiateData();
-                            }),
-                            onSaved: (val) => setState(() {
-                              category = val.toString();
-                            }),
-                          ),
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-
-                        for (int index = 0; index < tempData.length; index++)
-                          InkWell(
-                            onTap: () => detailBerita(tempData[index]),
-                            splashColor: HexColor("2C3246"),
-                            highlightColor: HexColor("2C3246").withOpacity(0.5),
-                            child: Container(
-                              margin: EdgeInsets.all(12.0),
-                              padding: EdgeInsets.all(8.0),
-                              decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(12.0),
-                                  // ignore: prefer_const_literals_to_create_immutables
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black12,
-                                      blurRadius: 3.0,
-                                    ),
-                                  ]),
-                              child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Container(
-                                      padding: EdgeInsets.fromLTRB(8, 0, 8, 0),
-                                      height: 200.0,
-                                      width: double.infinity,
-                                      decoration: BoxDecoration(
+                        (cropProses)
+                            ? Container(
+                                height: MediaQuery.of(context).size.height,
+                                width: MediaQuery.of(context).size.width,
+                                color: Colors.black54,
+                                child: const Center(
+                                    child: CircularProgressIndicator()),
+                              )
+                            : Center(),
+                        Column(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(20.0),
+                              child: DropdownButtonFormField<String>(
+                                decoration: InputDecoration(
+                                    border: OutlineInputBorder(
+                                        borderSide: BorderSide(
+                                            color: HexColor("2C3246")),
                                         borderRadius:
-                                            BorderRadius.circular(12.0),
-                                        image: DecorationImage(
-                                            image: NetworkImage(
-                                              tempData.isNotEmpty
-                                                  ? tempData[index]['image']
-                                                          ['path']
-                                                      .toString()
-                                                  : 'https://t4.ftcdn.net/jpg/00/89/55/15/360_F_89551596_LdHAZRwz3i4EM4J0NHNHy2hEUYDfXc0j.jpg',
-                                            ),
-                                            fit: BoxFit.cover),
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      height: 8.0,
-                                    ),
-                                    Container(
-                                      padding: EdgeInsets.all(6.0),
-                                      decoration: BoxDecoration(
-                                        color: HexColor("2C3246"),
-                                        borderRadius:
-                                            BorderRadius.circular(10.0),
-                                      ),
-                                      child: Text(
-                                        !isLoading
-                                            ? tempData[index]['author']
-                                                .toString()
-                                            : '',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 16.0,
-                                        ),
-                                        textAlign: TextAlign.left,
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      height: 8.0,
-                                    ),
-                                    Container(
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Container(
-                                            alignment: Alignment.centerLeft,
-                                            child: Text(
-                                              !isLoading
-                                                  ? tempData[index]['title']
-                                                      .toString()
-                                                  : '',
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 20.0,
-                                              ),
-                                            ),
-                                          ),
-                                          Container(
-                                              alignment: Alignment.centerRight,
-                                              child: IconButton(
-                                                iconSize: 35,
-                                                onPressed: () {
-                                                  likeManagement(
-                                                      tempData[index]['id'],
-                                                      tempData[index]
-                                                          ['has_like']);
-                                                },
-                                                icon: Icon(
-                                                  tempData[index]['has_like']
-                                                      ? Icons.favorite
-                                                      : Icons.favorite_outline,
-                                                  color: tempData[index]
-                                                          ['has_like']
-                                                      ? Colors.red
-                                                      : HexColor("2C3246"),
-                                                ),
-                                              ))
-                                        ],
-                                      ),
-                                    ),
-                                  ]),
+                                            BorderRadius.circular(20))),
+                                isExpanded: false,
+                                items: optCategory
+                                    .map<DropdownMenuItem<String>>((items) {
+                                  return DropdownMenuItem(
+                                      value: items['val'].toString(),
+                                      child: Text(items['name'].toString()));
+                                }).toList(),
+                                value: category,
+                                onChanged: (val) => setState(() {
+                                  category = val.toString();
+                                  initiateData();
+                                }),
+                                onSaved: (val) => setState(() {
+                                  category = val.toString();
+                                }),
+                              ),
                             ),
-                          )
-                        // Container(
-                        //   margin: const EdgeInsets.all(10),
-                        //   decoration: const BoxDecoration(
-                        //     borderRadius:
-                        //         BorderRadius.all(Radius.circular(20.0)),
-                        //     color: Colors.black12,
-                        //   ),
-                        //   child: InkWell(
-                        //     splashColor: Colors.yellow,
-                        //     highlightColor: Colors.blue.withOpacity(0.5),
-                        //     borderRadius:
-                        //         const BorderRadius.all(Radius.circular(20.0)),
-                        //     onTap: () => detailBerita(tempData[index]),
-                        //     child: Padding(
-                        //       padding: const EdgeInsets.symmetric(
-                        //           vertical: 15, horizontal: 15),
-                        //       child: Align(
-                        //         alignment: Alignment.topLeft,
-                        //         child: Row(
-                        //           children: [
-                        //             Image.network(
-                        //                 tempData.isNotEmpty
-                        //                     ? tempData[index]['image']['path']
-                        //                         .toString()
-                        //                     : 'https://t4.ftcdn.net/jpg/00/89/55/15/360_F_89551596_LdHAZRwz3i4EM4J0NHNHy2hEUYDfXc0j.jpg',
-                        //                 width: 80,
-                        //                 height: 80),
-                        //             Expanded(
-                        //               flex: 3,
-                        //               child: Padding(
-                        //                 padding: const EdgeInsets.symmetric(
-                        //                     horizontal: 20),
-                        //                 child: Column(
-                        //                   crossAxisAlignment:
-                        //                       CrossAxisAlignment.start,
-                        //                   mainAxisAlignment:
-                        //                       MainAxisAlignment.start,
-                        //                   children: [
-                        //                     Text(
-                        //                       !isLoading
-                        //                           ? tempData[index]['title']
-                        //                               .toString()
-                        //                           : '',
-                        //                       textAlign: TextAlign.left,
-                        //                     ),
-                        //                     Text(!isLoading
-                        //                         ? tempData[index]['title']
-                        //                             .toString()
-                        //                         : ''),
-                        //                   ],
-                        //                 ),
-                        //               ),
-                        //             ),
-                        //             Expanded(
-                        //                 flex: 1,
-                        //                 child: IconButton(
-                        //                   onPressed: () {
-                        //                     likeManagement(
-                        //                         tempData[index]['id'],
-                        //                         tempData[index]['has_like']);
-                        //                   },
-                        //                   icon: Icon(
-                        //                     tempData[index]['has_like']
-                        //                         ? Icons.favorite
-                        //                         : Icons.favorite_outline,
-                        //                     color: tempData[index]['has_like']
-                        //                         ? Colors.red
-                        //                         : Colors.blue,
-                        //                   ),
-                        //                 ))
-                        //           ],
-                        //         ),
-                        //       ),
-                        //     ),
-                        //   ),
-                        // )
+                            const SizedBox(
+                              height: 10,
+                            ),
+
+                            for (int index = 0;
+                                index < tempData.length;
+                                index++)
+                              InkWell(
+                                onTap: () => detailBerita(tempData[index]),
+                                splashColor: HexColor("2C3246"),
+                                highlightColor:
+                                    HexColor("2C3246").withOpacity(0.5),
+                                child: Container(
+                                  margin: EdgeInsets.all(12.0),
+                                  padding: EdgeInsets.all(8.0),
+                                  decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(12.0),
+                                      // ignore: prefer_const_literals_to_create_immutables
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black12,
+                                          blurRadius: 3.0,
+                                        ),
+                                      ]),
+                                  child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Container(
+                                          padding:
+                                              EdgeInsets.fromLTRB(8, 0, 8, 0),
+                                          height: 200.0,
+                                          width: double.infinity,
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(12.0),
+                                            image: DecorationImage(
+                                                image: NetworkImage(
+                                                  tempData.isNotEmpty
+                                                      ? tempData[index]['image']
+                                                              ['path']
+                                                          .toString()
+                                                      : 'https://t4.ftcdn.net/jpg/00/89/55/15/360_F_89551596_LdHAZRwz3i4EM4J0NHNHy2hEUYDfXc0j.jpg',
+                                                ),
+                                                fit: BoxFit.cover),
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          height: 8.0,
+                                        ),
+                                        Container(
+                                          padding: EdgeInsets.all(6.0),
+                                          decoration: BoxDecoration(
+                                            color: HexColor("2C3246"),
+                                            borderRadius:
+                                                BorderRadius.circular(10.0),
+                                          ),
+                                          child: Text(
+                                            !isLoading
+                                                ? tempData[index]['author']
+                                                    .toString()
+                                                : '',
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 16.0,
+                                            ),
+                                            textAlign: TextAlign.left,
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          height: 8.0,
+                                        ),
+                                        Container(
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Flexible(
+                                                child: Container(
+                                                  alignment: Alignment.centerLeft,
+                                                  child: Text(
+                                                    !isLoading
+                                                        ? tempData[index]['title']
+                                                            .toString()
+                                                        : '',
+                                                        softWrap: false,
+                                                        overflow: TextOverflow.ellipsis,
+                                                    style: TextStyle(
+                                                      fontWeight: FontWeight.bold,
+                                                      fontSize: 20.0,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              Container(
+                                                  alignment:
+                                                      Alignment.centerRight,
+                                                  child: IconButton(
+                                                    iconSize: 35,
+                                                    onPressed: () {
+                                                      likeManagement(
+                                                          tempData[index]['id'],
+                                                          tempData[index]
+                                                              ['has_like']);
+                                                    },
+                                                    icon: Icon(
+                                                      tempData[index]
+                                                              ['has_like']
+                                                          ? Icons.favorite
+                                                          : Icons
+                                                              .favorite_outline,
+                                                      color: tempData[index]
+                                                              ['has_like']
+                                                          ? Colors.red
+                                                          : HexColor("2C3246"),
+                                                    ),
+                                                  ))
+                                            ],
+                                          ),
+                                        ),
+                                      ]),
+                                ),
+                              )
+                            // Container(
+                            //   margin: const EdgeInsets.all(10),
+                            //   decoration: const BoxDecoration(
+                            //     borderRadius:
+                            //         BorderRadius.all(Radius.circular(20.0)),
+                            //     color: Colors.black12,
+                            //   ),
+                            //   child: InkWell(
+                            //     splashColor: Colors.yellow,
+                            //     highlightColor: Colors.blue.withOpacity(0.5),
+                            //     borderRadius:
+                            //         const BorderRadius.all(Radius.circular(20.0)),
+                            //     onTap: () => detailBerita(tempData[index]),
+                            //     child: Padding(
+                            //       padding: const EdgeInsets.symmetric(
+                            //           vertical: 15, horizontal: 15),
+                            //       child: Align(
+                            //         alignment: Alignment.topLeft,
+                            //         child: Row(
+                            //           children: [
+                            //             Image.network(
+                            //                 tempData.isNotEmpty
+                            //                     ? tempData[index]['image']['path']
+                            //                         .toString()
+                            //                     : 'https://t4.ftcdn.net/jpg/00/89/55/15/360_F_89551596_LdHAZRwz3i4EM4J0NHNHy2hEUYDfXc0j.jpg',
+                            //                 width: 80,
+                            //                 height: 80),
+                            //             Expanded(
+                            //               flex: 3,
+                            //               child: Padding(
+                            //                 padding: const EdgeInsets.symmetric(
+                            //                     horizontal: 20),
+                            //                 child: Column(
+                            //                   crossAxisAlignment:
+                            //                       CrossAxisAlignment.start,
+                            //                   mainAxisAlignment:
+                            //                       MainAxisAlignment.start,
+                            //                   children: [
+                            //                     Text(
+                            //                       !isLoading
+                            //                           ? tempData[index]['title']
+                            //                               .toString()
+                            //                           : '',
+                            //                       textAlign: TextAlign.left,
+                            //                     ),
+                            //                     Text(!isLoading
+                            //                         ? tempData[index]['title']
+                            //                             .toString()
+                            //                         : ''),
+                            //                   ],
+                            //                 ),
+                            //               ),
+                            //             ),
+                            //             Expanded(
+                            //                 flex: 1,
+                            //                 child: IconButton(
+                            //                   onPressed: () {
+                            //                     likeManagement(
+                            //                         tempData[index]['id'],
+                            //                         tempData[index]['has_like']);
+                            //                   },
+                            //                   icon: Icon(
+                            //                     tempData[index]['has_like']
+                            //                         ? Icons.favorite
+                            //                         : Icons.favorite_outline,
+                            //                     color: tempData[index]['has_like']
+                            //                         ? Colors.red
+                            //                         : Colors.blue,
+                            //                   ),
+                            //                 ))
+                            //           ],
+                            //         ),
+                            //       ),
+                            //     ),
+                            //   ),
+                            // )
+                          ],
+                        ),
                       ],
                     )),
               )),

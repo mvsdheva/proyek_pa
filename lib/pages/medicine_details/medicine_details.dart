@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors
+// ignore_for_file: prefer_const_constructors, avoid_single_cascade_in_expression_statements
 
 import 'dart:convert';
 
@@ -20,6 +20,7 @@ class MedicineDetails extends StatefulWidget {
 }
 
 class MedicineDetailsState extends State<MedicineDetails> {
+  TextEditingController find = TextEditingController();
   double windowHeight = 0;
   double windowWidth = 0;
   bool isLoading = false;
@@ -40,6 +41,7 @@ class MedicineDetailsState extends State<MedicineDetails> {
   void initState() {
     super.initState();
     initiateData();
+    getItem();
   }
 
   initiateData() async {
@@ -60,7 +62,7 @@ class MedicineDetailsState extends State<MedicineDetails> {
 
   getItem() async {
     await ApiServices()
-        .getItemsPublic(token, idItem.toString(), "")
+        .getItemsPublic(token, idItem.toString(), find.text)
         .then((json) {
       if (json != null) {
         if (json['status'] == 'success') {
@@ -200,317 +202,416 @@ class MedicineDetailsState extends State<MedicineDetails> {
     windowWidth = MediaQuery.of(context).size.width;
     return Scaffold(
         appBar: AppBar(
-            backgroundColor: HexColor("2C3246"), title: const Text("Detail Obat")),
-        backgroundColor: Colors.blue,
+            backgroundColor: HexColor("2C3246"),
+            title: const Text("Detail Obat")),
         body: SafeArea(
-          bottom: false,
+          // bottom: false,
           child: Stack(
             children: <Widget>[
               // ignore: sized_box_for_whitespace
               Container(
                   height: windowHeight,
                   child: Column(children: <Widget>[
-                    for (var i = 0; i < dataIdCart[0]['detail'].length; i++)
-                      Container(
-                          margin: EdgeInsets.all(10),
-                          child: 
-                          // IconButton(
-                          //   icon: Icon(Icons.location_on_outlined),
-                          //   onPressed: () {
-                          //     print(dataIdCart[0]['detail'][i]);
-                          //   },
-                          // )
-                          ExpansionPanelList(
-                            expansionCallback: (panelIndex, isExpanded) {
-                              active = !active;
-                              if (exTitle == "Sport Categories")
-                                exTitle = "Contract";
-                              else
-                                exTitle = "Sport Categories";
-                              setState(() {});
-                            },
-                            children: <ExpansionPanel>[
-                              ExpansionPanel(
-                                  headerBuilder: (context, isExpanded) {
-                                    return const ListTile(
-                                      visualDensity: VisualDensity.compact,
-                                      dense: true,
-                                      title: Text('Show Apotek'),
-                                    );
-                                  },
-                                  body: dataIdCart.isNotEmpty
-                                      ? Column(
-                                          children: [
-                                            for (var i = 0;
-                                                i < dataIdCart[0]['detail'].length;
-                                                i++)
-                                              Container(
-                                                  color: idx == i
-                                                      ? Colors.grey[400]
-                                                      : Colors.white,
-                                                  alignment: Alignment.topCenter,
-                                                  child: InkWell(
-                                                    highlightColor: HexColor("2C3246"),
-                                                    onTap: () {
-                                                      _launchInWebViewOrVC(dataIdCart[0]['detail'][i]['link_address']);
-                                                      // setIdx(i);
-                                                    },
-                                                    child: Padding(
-                                                      padding:
-                                                          const EdgeInsets.only(
-                                                              top: 5,
-                                                              left: 20,
-                                                              right: 20,
-                                                              bottom: 20),
-                                                      child: Row(
-                                                        children: [
-                                                          Expanded(
-                                                            flex: 1,
-                                                            child: Container(
-                                                              child: Align(
-                                                                alignment: Alignment
-                                                                    .center,
-                                                                child: Text(dataIdCart
-                                                                        .isNotEmpty
-                                                                    ? dataIdCart[0]['detail'][i]
-                                                                                [
-                                                                                'data_apotek']
-                                                                            ['name']
-                                                                        .toString()
-                                                                    : ""),
-                                                              ),
-                                                            ),
-                                                          ),
-                                                          Expanded(
-                                                            flex: 1,
-                                                            child: Container(
-                                                              child: Align(
-                                                                alignment: Alignment
-                                                                    .center,
-                                                                child: Text(dataIdCart
-                                                                        .isNotEmpty
-                                                                    ? dataIdCart[0]['detail'][i]
-                                                                                [
-                                                                                'data_apotek']
-                                                                            ['city']
-                                                                        .toString()
-                                                                    : ""),
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                  )),
-                                          ],
-                                        )
-                                      : Text(''),
-                                  isExpanded: active,
-                                  canTapOnHeader: true)
-                            ],
-                          ),
-                          ),
+                    Container(
+                      alignment: Alignment.centerRight,
+                      margin: EdgeInsets.all(10),
+                      child: IconButton(
+                        icon: Icon(Icons.location_on_outlined, size: 30),
+                        onPressed: () {
+                          print("=====");
+                          print(dataIdCart[0]['detail']);
+                          showDialog(
+                              context: context,
+                              builder: (context) {
+                                return AlertDialog(
+                                    actions: [
+                                      ElevatedButton(
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                        },
+                                        child: Text("Cancel"),
+                                      ),
+                                      ElevatedButton(
+                                        onPressed: () {},
+                                        child: Text("Ok"),
+                                      ),
+                                    ],
+                                    content: Container(
+                                      width: double.maxFinite,
+                                      child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: <Widget>[
+                                            Expanded(
+                                                child: ListView.builder(
+                                              itemCount: dataIdCart.length
+                                                  .compareTo(0),
+                                              shrinkWrap: true,
+                                              itemBuilder:
+                                                  (BuildContext context,
+                                                      int index) {
+                                                return StatefulBuilder(
+                                                  builder:
+                                                      (BuildContext context,
+                                                          setState) {
+                                                    return Padding(
+                                                        padding:
+                                                            EdgeInsets.all(8.0),
+                                                        child: Column(
+                                                            children: dataIdCart
+                                                                    ?.map(
+                                                                        (data) {
+                                                                  return TextButton(
+                                                                      onPressed:
+                                                                          () {},
+                                                                      child: Text(dataIdCart[index]['detail'][index]['data_apotek']
+                                                                              [
+                                                                              'name']
+                                                                          .toString()));
+                                                                })?.toList() ??
+                                                                []
+                                                            // [
+                                                            //   TextButton(
+                                                            //     onPressed: () {
+                                                            //       launch(dataIdCart[index]['detail']
+                                                            //                       [
+                                                            //                       index]
+                                                            //                   [
+                                                            //                   'data_apotek']
+                                                            //               [
+                                                            //               'link_address']
+                                                            //           .toString());
+                                                            //       print(dataIdCart[index]['detail']
+                                                            //                       [
+                                                            //                       index]
+                                                            //                   [
+                                                            //                   'data_apotek']
+                                                            //               [
+                                                            //               'link_address']
+                                                            //           .toString());
+                                                            //     },
+                                                            //     child: Text(dataIdCart[
+                                                            //                     index]
+                                                            //                 [
+                                                            //                 'detail'][index]
+                                                            //             [
+                                                            //             'data_apotek']['name']
+                                                            //         .toString()),
+                                                            //   ),
+                                                            // ],
+                                                            ));
+                                                  },
+                                                );
+                                              },
+                                            )),
+                                          ]),
+                                    ));
+                              });
+                          // AwesomeDialog(
+                          //     context: context,
+                          //     dialogType: DialogType.NO_HEADER,
+                          //     animType: AnimType.SCALE,
+                          //     headerAnimationLoop: false,
+                          //     body: StatefulBuilder(
+                          //       builder: (BuildContext context, setState) {
+                          //         return Padding(
+                          //           padding: EdgeInsets.all(8.0),
+                          //           child: Text(dataIdCart[0]['detail'][0]
+                          //                   ['data_apotek']['name']
+                          //               .toString()),
+                          //           // child: InkWell(
+                          //           //   onTap: () {
+                          //           //     _launchInWebViewOrVC(dataIdCart[0]
+                          //           //         ['detail'][0]['link_address']);
+                          //           //     // setIdx(i);
+                          //           //   },
+                          //           //   child: Text(dataIdCart[0]['detail'][0]
+                          //           //               ['data_apotek']['name']
+                          //           //           .toString()),
+                          //           // )
+                          //         );
+                          //       },
+                          //     ))
+                          //   ..show();
+                        },
+                      ),
+                      // ExpansionPanelList(
+                      //   expansionCallback: (panelIndex, isExpanded) {
+                      //     active = !active;
+                      //     if (exTitle == "Sport Categories")
+                      //       exTitle = "Contract";
+                      //     else
+                      //       exTitle = "Sport Categories";
+                      //     setState(() {});
+                      //   },
+                      //   children: <ExpansionPanel>[
+                      //     ExpansionPanel(
+                      //         headerBuilder: (context, isExpanded) {
+                      //           return const ListTile(
+                      //             visualDensity: VisualDensity.compact,
+                      //             dense: true,
+                      //             title: Text('Show Apotek'),
+                      //           );
+                      //         },
+                      //         body: dataIdCart.isNotEmpty
+                      //             ? Column(
+                      //                 children: [
+                      //                   for (var i = 0;
+                      //                       i < dataIdCart[0]['detail'].length;
+                      //                       i++)
+                      //                     Container(
+                      //                         color: idx == i
+                      //                             ? Colors.grey[400]
+                      //                             : Colors.white,
+                      //                         alignment: Alignment.topCenter,
+                      //                         child: InkWell(
+                      //                           highlightColor: HexColor("2C3246"),
+                      //                           onTap: () {
+                      //                             // _launchInWebViewOrVC(dataIdCart[0]['detail'][i]['link_address']);
+                      //                             print("++++");
+                      //                             print(dataIdCart[0]['detail']);
+                      //                             // setIdx(i);
+                      //                           },
+                      //                           child: Padding(
+                      //                             padding:
+                      //                                 const EdgeInsets.only(
+                      //                                     top: 5,
+                      //                                     left: 20,
+                      //                                     right: 20,
+                      //                                     bottom: 20),
+                      //                             child: Row(
+                      //                               children: [
+                      //                                 Expanded(
+                      //                                   flex: 1,
+                      //                                   child: Container(
+                      //                                     child: Align(
+                      //                                       alignment: Alignment
+                      //                                           .center,
+                      //                                       child: Text(dataIdCart
+                      //                                               .isNotEmpty
+                      //                                           ? dataIdCart[i]['detail'][i]
+                      //                                                       [
+                      //                                                       'data_apotek']
+                      //                                                   ['name']
+                      //                                               .toString()
+                      //                                           : ""),
+                      //                                     ),
+                      //                                   ),
+                      //                                 ),
+                      //                                 Expanded(
+                      //                                   flex: 1,
+                      //                                   child: Container(
+                      //                                     child: Align(
+                      //                                       alignment: Alignment
+                      //                                           .center,
+                      //                                       child: Text(dataIdCart
+                      //                                               .isNotEmpty
+                      //                                           ? dataIdCart[i]['detail'][i]
+                      //                                                       [
+                      //                                                       'data_apotek']
+                      //                                                   ['city']
+                      //                                               .toString()
+                      //                                           : ""),
+                      //                                     ),
+                      //                                   ),
+                      //                                 ),
+                      //                               ],
+                      //                             ),
+                      //                           ),
+                      //                         )),
+                      //                 ],
+                      //               )
+                      //             : Text("Kosong"),
+                      //         isExpanded: active,
+                      //         canTapOnHeader: true)
+                      //   ],
+                      // ),
+                    ),
                     Expanded(
                         flex: 1,
                         child: Container(
-                          color: HexColor("2C3246"),
-                          child: ClipRRect(
-                              borderRadius: BorderRadius.circular(100.0),
-                              child: Image.network(
-                                  dataIdCart.isNotEmpty
-                                      ? dataIdCart[0]['detail'][idx]['image']
-                                              ['path']
-                                          .toString()
-                                      : 'https://t4.ftcdn.net/jpg/00/89/55/15/360_F_89551596_LdHAZRwz3i4EM4J0NHNHy2hEUYDfXc0j.jpg',
-                                  width: 100,
-                                  height: 100)),
-                        )),
-                    Expanded(
-                        flex: 2,
-                        child: Container(
-                          decoration: const BoxDecoration(
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black26,
-                                  offset: Offset(0.0, 2.0),
-                                  blurRadius: 25.0,
-                                )
-                              ],
-                              color: Colors.white,
-                              borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(32),
-                                  topRight: Radius.circular(32))),
-                          alignment: Alignment.topCenter,
-                          child: ListView(
-                            scrollDirection: Axis.vertical,
-                            physics: const AlwaysScrollableScrollPhysics(),
-                            shrinkWrap: true,
-                            padding: const EdgeInsets.all(5.0),
-                            children: <Widget>[
-                              Padding(
-                                  padding: const EdgeInsets.only(
-                                      left: 25, right: 25, top: 20, bottom: 5),
-                                  child: Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Expanded(
-                                        flex: 1,
-                                        child: Text(
-                                          dataIdCart.isNotEmpty
-                                              ? dataIdCart[0]['detail'][idx]
-                                                      ['name']
-                                                  .toString()
-                                              : '',
-                                          textAlign: TextAlign.left,
-                                          style: const TextStyle(
-                                              fontFamily: 'Nunito',
-                                              fontSize: 20),
-                                        ),
-                                      ),
-                                      IconButton(
-                                        alignment: Alignment.centerRight,
-                                        onPressed: () {
-                                          likeManagement(
-                                              dataIdCart[0]['detail'][idx]
-                                                  ['id'],
-                                              dataIdCart[0]['detail'][idx]
-                                                  ['has_like']);
-                                        },
-                                        icon: Icon(
-                                          dataIdCart.isNotEmpty
-                                              ? dataIdCart[0]['detail'][idx]
-                                                      ['has_like']
-                                                  ? Icons.favorite
-                                                  : Icons.favorite_outline
-                                              : Icons.favorite_outline,
-                                          color: dataIdCart.isNotEmpty
-                                              ? dataIdCart[0]['detail'][idx]
-                                                      ['has_like']
-                                                  ? Colors.red
-                                                  : HexColor("2C3246")
-                                              : HexColor("2C3246"),
-                                        ),
-                                        color: HexColor("2C3246"),
-                                      ),
-                                    ],
-                                  )),
-                              Padding(
-                                  padding: const EdgeInsets.only(
-                                      left: 20, right: 25, top: 5, bottom: 5),
-                                  child: Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Expanded(
-                                        flex: 1,
-                                        child: Row(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.center,
-                                          children: [
-                                            Expanded(
-                                              flex: 1,
-                                              child: IconButton(
-                                                  onPressed: () {
-                                                    if (unit > 0) {
-                                                      setState(() {
-                                                        unit = unit - 1;
-                                                      });
-                                                    }
-                                                  },
-                                                  alignment:
-                                                      Alignment.centerLeft,
-                                                  icon: const Icon(
-                                                    Icons.remove_circle,
-                                                    size: 40,
-                                                  )),
-                                            ),
-                                            Container(
-                                              height: windowHeight * 0.04,
-                                              margin:
-                                                  const EdgeInsets.only(top: 5),
-                                              child: Align(
-                                                alignment: Alignment.center,
-                                                child: Text(
-                                                  unit.toString(),
-                                                  textAlign: TextAlign.center,
-                                                  style: const TextStyle(
-                                                      fontFamily: 'Nunito',
-                                                      fontSize: 20),
-                                                ),
-                                              ),
-                                            ),
-                                            Expanded(
-                                              flex: 1,
-                                              child: IconButton(
-                                                  alignment:
-                                                      Alignment.centerRight,
-                                                  onPressed: () {
-                                                    setState(() {
-                                                      unit = unit + 1;
-                                                    });
-                                                  },
-                                                  icon: const Icon(
-                                                    Icons.add_circle,
-                                                    size: 40,
-                                                  )),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      Expanded(
-                                        flex: 1,
-                                        child: Text(
-                                          dataIdCart.isNotEmpty
-                                              ? "Rp. " +
-                                                  dataIdCart[0]['detail'][idx]
-                                                          ['price']
-                                                      .toString()
-                                              : "Rp. -",
-                                          textAlign: TextAlign.right,
-                                          style: const TextStyle(
-                                              fontFamily: 'Nunito',
-                                              fontSize: 20),
-                                        ),
-                                      )
-                                    ],
-                                  )),
-                              Padding(
-                                  padding: const EdgeInsets.only(
-                                      left: 20, right: 25, top: 10, bottom: 5),
-                                  child: Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Expanded(
-                                        flex: 1,
-                                        child: Text(
-                                          dataIdCart.isNotEmpty
-                                              ? dataIdCart[0]['detail'][idx]
-                                                      ['description']
-                                                  .toString()
-                                              : "",
-                                          textAlign: TextAlign.left,
-                                          style: const TextStyle(
-                                              fontFamily: 'Nunito',
-                                              fontSize: 20),
-                                        ),
-                                      )
-                                    ],
-                                  )),
-                            ],
-                          ),
-                        )),
+                            margin: EdgeInsets.only(bottom: 10),
+                            width: double.infinity,
+                            // color: HexColor("2C3246"),
+                            child: Image.network(
+                                dataIdCart.isNotEmpty
+                                    ? dataIdCart[0]['detail'][idx]['image']
+                                            ['path']
+                                        .toString()
+                                    : 'https://t4.ftcdn.net/jpg/00/89/55/15/360_F_89551596_LdHAZRwz3i4EM4J0NHNHy2hEUYDfXc0j.jpg',
+                                width: 100,
+                                height: 100))),
                     Expanded(
                         child: Container(
+                      decoration: const BoxDecoration(
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black26,
+                            offset: Offset(0.0, 2.0),
+                            blurRadius: 25.0,
+                          )
+                        ],
+                        color: Colors.white,
+                      ),
+                      alignment: Alignment.topCenter,
+                      child: ListView(
+                        scrollDirection: Axis.vertical,
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        padding: const EdgeInsets.all(5.0),
+                        children: <Widget>[
+                          Padding(
+                              padding: const EdgeInsets.only(
+                                  left: 25, right: 25, top: 20, bottom: 5),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Expanded(
+                                    flex: 1,
+                                    child: Text(
+                                      dataIdCart.isNotEmpty
+                                          ? dataIdCart[0]['detail'][idx]['name']
+                                              .toString()
+                                          : '',
+                                      textAlign: TextAlign.left,
+                                      style: const TextStyle(
+                                          fontFamily: 'Nunito', fontSize: 20),
+                                    ),
+                                  ),
+                                  IconButton(
+                                    alignment: Alignment.centerRight,
+                                    onPressed: () {
+                                      likeManagement(
+                                          dataIdCart[0]['detail'][idx]['id'],
+                                          dataIdCart[0]['detail'][idx]
+                                              ['has_like']);
+                                    },
+                                    icon: Icon(
+                                      dataIdCart.isNotEmpty
+                                          ? dataIdCart[0]['detail'][idx]
+                                                  ['has_like']
+                                              ? Icons.favorite
+                                              : Icons.favorite_outline
+                                          : Icons.favorite_outline,
+                                      color: dataIdCart.isNotEmpty
+                                          ? dataIdCart[0]['detail'][idx]
+                                                  ['has_like']
+                                              ? Colors.red
+                                              : HexColor("2C3246")
+                                          : HexColor("2C3246"),
+                                    ),
+                                    color: HexColor("2C3246"),
+                                  ),
+                                ],
+                              )),
+                          Padding(
+                              padding: const EdgeInsets.only(
+                                  left: 20, right: 25, top: 5, bottom: 5),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Expanded(
+                                    flex: 1,
+                                    child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        Expanded(
+                                          flex: 1,
+                                          child: IconButton(
+                                              onPressed: () {
+                                                if (unit > 0) {
+                                                  setState(() {
+                                                    unit = unit - 1;
+                                                  });
+                                                }
+                                              },
+                                              alignment: Alignment.centerLeft,
+                                              icon: const Icon(
+                                                Icons.remove_circle,
+                                                size: 40,
+                                              )),
+                                        ),
+                                        Container(
+                                          height: windowHeight * 0.04,
+                                          margin: const EdgeInsets.only(top: 5),
+                                          child: Align(
+                                            alignment: Alignment.center,
+                                            child: Text(
+                                              unit.toString(),
+                                              textAlign: TextAlign.center,
+                                              style: const TextStyle(
+                                                  fontFamily: 'Nunito',
+                                                  fontSize: 20),
+                                            ),
+                                          ),
+                                        ),
+                                        Expanded(
+                                          flex: 1,
+                                          child: IconButton(
+                                              alignment: Alignment.centerRight,
+                                              onPressed: () {
+                                                setState(() {
+                                                  unit = unit + 1;
+                                                });
+                                              },
+                                              icon: const Icon(
+                                                Icons.add_circle,
+                                                size: 40,
+                                              )),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 1,
+                                    child: Text(
+                                      dataIdCart.isNotEmpty
+                                          ? "Rp. " +
+                                              dataIdCart[0]['detail'][idx]
+                                                      ['price']
+                                                  .toString()
+                                          : "Rp. -",
+                                      textAlign: TextAlign.right,
+                                      style: const TextStyle(
+                                          fontFamily: 'Nunito', fontSize: 20),
+                                    ),
+                                  )
+                                ],
+                              )),
+                          Padding(
+                              padding: const EdgeInsets.only(
+                                  left: 20, right: 25, top: 10, bottom: 5),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Expanded(
+                                    flex: 1,
+                                    child: Text(
+                                      dataIdCart.isNotEmpty
+                                          ? dataIdCart[0]['detail'][idx]
+                                                  ['description']
+                                              .toString()
+                                          : "",
+                                      textAlign: TextAlign.left,
+                                      style: const TextStyle(
+                                          fontFamily: 'Nunito', fontSize: 20),
+                                    ),
+                                  )
+                                ],
+                              )),
+                        ],
+                      ),
+                    )),
+                    Container(
+                      height: 50,
                       color: Colors.white,
                       child: Align(
                         alignment: Alignment.bottomCenter,
                         child: Padding(
                           padding: const EdgeInsets.only(
-                              left: 20, right: 25, top: 10, bottom: 5),
+                              left: 20, right: 25, top: 5, bottom: 5),
                           child: Row(
                             children: [
                               Expanded(
@@ -556,11 +657,11 @@ class MedicineDetailsState extends State<MedicineDetails> {
                                   style: ElevatedButton.styleFrom(
                                     side: BorderSide(
                                       width: 1.0,
-                                      color: defaultColor,
+                                      color: HexColor("#2C3246"),
                                     ),
-                                    onPrimary: Colors.amber[400],
-                                    onSurface: Colors.white,
-                                    primary: defaultColor,
+                                    onPrimary: HexColor("#2C3246"),
+                                    onSurface: HexColor("#2C3246"),
+                                    primary: HexColor("#2C3246"),
                                     shape: RoundedRectangleBorder(
                                         borderRadius:
                                             BorderRadius.circular(10.0)),
@@ -582,7 +683,7 @@ class MedicineDetailsState extends State<MedicineDetails> {
                           ),
                         ),
                       ),
-                    ))
+                    )
                   ])),
               Loading(isLoading)
             ],

@@ -514,7 +514,7 @@ class ApiServices {
           headers: {
             'Authorization': 'Bearer $token',
             'Content-Type': 'application/json;charset=UTF-8',
-              'Charset': 'utf-8'
+            'Charset': 'utf-8'
           }).timeout(Duration(seconds: timeout));
       if (response.statusCode == 200) {
         var res = json.decode(response.body);
@@ -618,12 +618,12 @@ class ApiServices {
 
   Future<dynamic> getProfileUser(String token) async {
     try {
-      final response = await http.get(Uri.parse('$baseUrl/users/profile'),
-          headers: {
-            'Authorization': 'Bearer $token',
-            'Content-Type': 'application/json;charset=UTF-8',
-              'Charset': 'utf-8'
-          }).timeout(Duration(seconds: timeout));
+      final response =
+          await http.get(Uri.parse('$baseUrl/users/profile'), headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json;charset=UTF-8',
+        'Charset': 'utf-8'
+      }).timeout(Duration(seconds: timeout));
       if (response.statusCode == 200) {
         var res = json.decode(response.body);
         return res;
@@ -704,12 +704,12 @@ class ApiServices {
 
   Future<dynamic> getRadioAdmin(String token) async {
     try {
-      final response = await http.get(Uri.parse('$baseUrl/administrator/radio'),
-          headers: {
-            'Authorization': 'Bearer $token',
-            'Content-Type': 'application/json;charset=UTF-8',
-              'Charset': 'utf-8'
-          }).timeout(Duration(seconds: timeout));
+      final response =
+          await http.get(Uri.parse('$baseUrl/administrator/radio'), headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json;charset=UTF-8',
+        'Charset': 'utf-8'
+      }).timeout(Duration(seconds: timeout));
       if (response.statusCode == 200) {
         var res = json.decode(response.body);
         return res;
@@ -824,12 +824,12 @@ class ApiServices {
   Future<dynamic> getRadioUser(String token) async {
     try {
       if (token != "") {
-        final response = await http.get(Uri.parse("$baseUrl/users/radio"),
-            headers: {
-              'Authorization': 'Bearer $token',
-              'Content-Type': 'application/json;charset=UTF-8',
-              'Charset': 'utf-8'
-            }).timeout(Duration(seconds: timeout));
+        final response =
+            await http.get(Uri.parse("$baseUrl/users/radio"), headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json;charset=UTF-8',
+          'Charset': 'utf-8'
+        }).timeout(Duration(seconds: timeout));
         if (response.statusCode == 200) {
           var res = json.decode(response.body);
           return res;
@@ -1024,12 +1024,12 @@ class ApiServices {
 
   Future<dynamic> getWish(String token) async {
     try {
-      final response = await http.get(Uri.parse('$baseUrl/users/like/wish'),
-          headers: {
-            'Authorization': 'Bearer $token',
-            'Content-Type': 'application/json;charset=UTF-8',
-              'Charset': 'utf-8'
-          }).timeout(Duration(seconds: timeout));
+      final response =
+          await http.get(Uri.parse('$baseUrl/users/like/wish'), headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json;charset=UTF-8',
+        'Charset': 'utf-8'
+      }).timeout(Duration(seconds: timeout));
       if (response.statusCode == 200) {
         var res = json.decode(response.body);
         return res;
@@ -1211,8 +1211,8 @@ class ApiServices {
 
   Future<dynamic> getApotekAdmin(String token) async {
     try {
-      final response = await http
-          .get(Uri.parse('$baseUrl/administrator/apotek'), headers: {
+      final response =
+          await http.get(Uri.parse('$baseUrl/administrator/apotek'), headers: {
         'Authorization': 'Bearer $token',
       }).timeout(Duration(seconds: timeout));
       if (response.statusCode == 200) {

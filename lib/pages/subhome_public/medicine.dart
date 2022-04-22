@@ -4,6 +4,7 @@ import 'dart:convert';
 
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:herbal/api/api_services.dart';
 import 'package:herbal/pages/auth/authlogin.dart';
@@ -30,9 +31,12 @@ class MedicinePageState extends State<MedicinePage> {
   var generalData = [];
   int cartPending = 0;
   var list_unit = [];
+  int idItem = 0;
   var tempSendCart = [];
 
   Future<void>? _launched;
+
+  bool cropProses = false;
 
   @override
   void initState() {
@@ -85,7 +89,7 @@ class MedicinePageState extends State<MedicinePage> {
   }
 
   getItem() async {
-    await ApiServices().getItemsPublic(token, "", find.text).then((json) {
+    await ApiServices().getItemsPublic(token, idItem.toString(),find.text).then((json) {
       if (json != null) {
         if (json['status'] == 'success') {
           setState(() {
@@ -318,135 +322,150 @@ class MedicinePageState extends State<MedicinePage> {
                 SizedBox(
                   height: 10,
                 ),
-                Align(
-                  alignment: Alignment.topLeft,
-                  child: Wrap(
-                    children: [
-                      for (var i = 0; i < tempData.length; i++)
-                        Container(
-                          margin: const EdgeInsets.all(7),
-                          width: windowWidth * 0.4,
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              onPrimary: defaultColor,
-                              onSurface: Colors.white,
-                              primary: Colors.white,
-                              shape: const RoundedRectangleBorder(
-                                borderRadius: BorderRadius.only(
-                                    bottomLeft: Radius.circular(15),
-                                    bottomRight: Radius.circular(15)),
-                              ),
-                            ),
-                            onPressed: () {
-                              setIDCart(tempData[i]);
-                            },
-                            child: Align(
-                              alignment: Alignment.topCenter,
-                              child: Stack(
-                                children: <Widget>[
-                                  // Positioned(
-                                  //   top: 0.0,
-                                  //   right: -10.0,
-                                  //   width: 50,
-                                  //   child: IconButton(
-                                  //     onPressed: () {
-                                  //       likeManagement(
-                                  //           tempData[i]['detail'][0]['id'],
-                                  //           tempData[i]['detail'][0]['has_like']);
-                                  //     },
-                                  //     icon: Icon(
-                                  //       tempData[i]['detail'][0]['has_like']
-                                  //           ? Icons.favorite
-                                  //           : Icons.favorite_outline,
-                                  //       color: tempData[i]['detail'][0]
-                                  //               ['has_like']
-                                  //           ? Colors.red
-                                  //           : Colors.blue,
-                                  //     ),
-                                  //     color: Colors.blue,
-                                  //   ),
-                                  // ),
-                                  Padding(
-                                    padding: const EdgeInsets.all(20.0),
-                                    child: Center(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          SizedBox(
-                                            width: windowWidth * 0.01,
-                                            height: windowHeight * 0.01,
-                                          ),
-                                          Align(
-                                              alignment: Alignment.center,
-                                              child: Image.network(
-                                                  tempData[i]['image']['path']
-                                                      .toString(),
-                                                  width: 100,
-                                                  height: 100)),
-                                          SizedBox(
-                                            width: windowWidth * 0.01,
-                                            height: windowHeight * 0.01,
-                                          ),
-                                          Center(
-                                            child: Text(
-                                              tempData[i]['name'].toString(),
-                                              textAlign: TextAlign.center,
-                                              style: const TextStyle(
-                                                color: Colors.black,
-                                              ),
-                                            ),
-                                          ),
-                                          SizedBox(
-                                            width: windowWidth * 0.01,
-                                            height: windowHeight * 0.01,
-                                          ),
-                                          // Row(
-                                          //   children: [
-                                          //     Expanded(
-                                          //       flex: 3,
-                                          //       child: Text(
-                                          //         "Rp. " +
-                                          //             tempData[i]['detail'][0]
-                                          //                     ['price']
-                                          //                 .toString(),
-                                          //         style: const TextStyle(
-                                          //           color: Colors.black,
-                                          //         ),
-                                          //       ),
-                                          //     ),
-                                          //     Expanded(
-                                          //         flex: 1,
-                                          //         child: IconButton(
-                                          //           highlightColor: Colors.black,
-                                          //           onPressed: () {
-                                          //             Navigator.push(
-                                          //                 context,
-                                          //                 MaterialPageRoute(
-                                          //                     builder: (context) =>
-                                          //                         const MedicineDetails()));
-                                          //           },
-                                          //           icon: const Icon(
-                                          //             Icons.add_circle,
-                                          //             size: 30,
-                                          //             color: Colors.blueAccent,
-                                          //           ),
-                                          //         ))
-                                          //   ],
-                                          // ),
-                                        ],
-                                      ),
-                                    ),
+                Stack(
+                  children: [
+                    Align(
+                      alignment: Alignment.topLeft,
+                      child: Wrap(
+                        children: [
+                          for (var i = 0; i < tempData.length; i++)
+                            Container(
+                              margin: const EdgeInsets.all(7),
+                              width: windowWidth * 0.4,
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  onPrimary: defaultColor,
+                                  onSurface: Colors.white,
+                                  primary: Colors.white,
+                                  shape: const RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.only(
+                                        bottomLeft: Radius.circular(15),
+                                        bottomRight: Radius.circular(15)),
                                   ),
-                                ],
+                                ),
+                                onPressed: () {
+                                  setIDCart(tempData[i]);
+                                },
+                                child: Align(
+                                  alignment: Alignment.topCenter,
+                                  child: Stack(
+                                    children: <Widget>[
+                                      // Positioned(
+                                      //   top: 0.0,
+                                      //   right: -10.0,
+                                      //   width: 50,
+                                      //   child: IconButton(
+                                      //     onPressed: () {
+                                      //       likeManagement(
+                                      //           tempData[i]['detail'][0]['id'],
+                                      //           tempData[i]['detail'][0]['has_like']);
+                                      //     },
+                                      //     icon: Icon(
+                                      //       tempData[i]['detail'][0]['has_like']
+                                      //           ? Icons.favorite
+                                      //           : Icons.favorite_outline,
+                                      //       color: tempData[i]['detail'][0]
+                                      //               ['has_like']
+                                      //           ? Colors.red
+                                      //           : Colors.blue,
+                                      //     ),
+                                      //     color: Colors.blue,
+                                      //   ),
+                                      // ),
+                                      Padding(
+                                        padding: const EdgeInsets.all(20.0),
+                                        child: Center(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              SizedBox(
+                                                width: windowWidth * 0.01,
+                                                height: windowHeight * 0.01,
+                                              ),
+                                              Align(
+                                                  alignment: Alignment.center,
+                                                  child: Image.network(
+                                                      tempData[i]['image']
+                                                              ['path']
+                                                          .toString(),
+                                                      width: 100,
+                                                      height: 100)),
+                                              SizedBox(
+                                                width: windowWidth * 0.01,
+                                                height: windowHeight * 0.01,
+                                              ),
+                                              Center(
+                                                child: Text(
+                                                  tempData[i]['name']
+                                                      .toString(),
+                                                  textAlign: TextAlign.center,
+                                                  style: const TextStyle(
+                                                    color: Colors.black,
+                                                  ),
+                                                ),
+                                              ),
+                                              SizedBox(
+                                                width: windowWidth * 0.01,
+                                                height: windowHeight * 0.01,
+                                              ),
+                                              // Row(
+                                              //   children: [
+                                              //     Expanded(
+                                              //       flex: 3,
+                                              //       child: Text(
+                                              //         "Rp. " +
+                                              //             tempData[i]['detail'][0]
+                                              //                     ['price']
+                                              //                 .toString(),
+                                              //         style: const TextStyle(
+                                              //           color: Colors.black,
+                                              //         ),
+                                              //       ),
+                                              //     ),
+                                              //     Expanded(
+                                              //         flex: 1,
+                                              //         child: IconButton(
+                                              //           highlightColor: Colors.black,
+                                              //           onPressed: () {
+                                              //             Navigator.push(
+                                              //                 context,
+                                              //                 MaterialPageRoute(
+                                              //                     builder: (context) =>
+                                              //                         const MedicineDetails()));
+                                              //           },
+                                              //           icon: const Icon(
+                                              //             Icons.add_circle,
+                                              //             size: 30,
+                                              //             color: Colors.blueAccent,
+                                              //           ),
+                                              //         ))
+                                              //   ],
+                                              // ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ),
-                            ),
-                          ),
-                        )
-                    ],
-                  ),
+                            )
+                        ],
+                      ),
+                    ),
+                    (cropProses)
+                        ? Container(
+                            height: MediaQuery.of(context).size.height,
+                            width: MediaQuery.of(context).size.width,
+                            color: Colors.black54,
+                            child: const Center(
+                                child: CircularProgressIndicator()),
+                          )
+                        : const Center(),
+                  ],
                 )
               ])),
         ),

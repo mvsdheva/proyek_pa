@@ -100,6 +100,7 @@ class HomePublicPageState extends State<HomePublicPage> {
             ],
           ),
         ),
+        
         // bottomNavigationBar:
         // BottomNavigationBar(
         //   backgroundColor: Colors.blue,
